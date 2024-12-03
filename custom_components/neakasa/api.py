@@ -11,6 +11,10 @@ import hashlib
 import base64
 import uuid
 
+#############################
+# Neakasa API by @timniklas #
+#############################
+
 class NeakasaAPI:
     def __init__(self, hass: HomeAssistant, app_key: str = "32715650", app_secret: str = "698ee0ef531c3df2ddded87563643860", country = "DE", language = "en-US") -> None:
         self._app_key = app_key
