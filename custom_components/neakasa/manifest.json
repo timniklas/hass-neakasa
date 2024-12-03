@@ -1,0 +1,10 @@
+{
+  "domain": "neakasa",
+  "name": "Neakasa",
+  "codeowners": ["@timniklas"],
+  "config_flow": true,
+  "documentation": "https://github.com/timniklas/hass-neakasa",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/timniklas/hass-neakasa/issues",
+  "version": "0.0.0"
+}
