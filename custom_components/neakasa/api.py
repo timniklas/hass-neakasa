@@ -2,7 +2,7 @@ import json
 from alibabacloud_iot_api_gateway.models import Config, IoTApiRequest, CommonParams
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from aiohttp import ClientError, ClientResponseError
-from client import Client
+from .client import Client
 from alibabacloud_tea_util.models import RuntimeOptions
 from homeassistant.core import HomeAssistant
 import time
@@ -18,6 +18,7 @@ class NeakasaAPI:
         self._country = country
         self._language = language
         self._session = async_get_clientsession(hass)
+        self.hass = hass
         self.connected: bool = False
 
     async def connect(self, username: str, password: str):
@@ -35,18 +36,18 @@ class NeakasaAPI:
             signature_raw = hmac.new(self._app_secret.encode(), (self._app_key + timestamp).encode(), digestmod=hashlib.sha256)
             signature = base64.b64encode(signature_raw.digest()).decode("utf-8")
             async with self._session.post(
-              url='https://eu.neakasa.com/api/login/user',
-              json={
-                  "product_id": "a123nCqsrQm3vEbt",
-                  "system": 2,
-                  "system_version": "Android14,SDK:34",
-                  "system_number": "GOOGLE_sdk_gphone64_x86_64-userdebug 14 UE1A.230829.050 12077443 dev-keys_sdk_gphone64_x86_64",
-                  "app_version": "2.0.9",
-                  "account": username,
-                  "type": 3,
-                  "password": password
-              },
-              headers={
+                url='https://eu.neakasa.com/api/login/user',
+                json={
+                    "product_id": "a123nCqsrQm3vEbt",
+                    "system": 2,
+                    "system_version": "Android14,SDK:34",
+                    "system_number": "GOOGLE_sdk_gphone64_x86_64-userdebug 14 UE1A.230829.050 12077443 dev-keys_sdk_gphone64_x86_64",
+                    "app_version": "2.0.9",
+                    "account": username,
+                    "type": 3,
+                    "password": password
+                },
+                headers={
                 "Request-Id": signature,
                 "Appid": self._app_key,
                 "Timestamp": timestamp,
@@ -78,7 +79,7 @@ class NeakasaAPI:
             },
             request=request
         )
-        response = client.do_request(
+        response = await self.hass.async_add_executor_job(client.do_request,
             '/living/account/region/get',
             'https',
             'POST',
@@ -101,7 +102,7 @@ class NeakasaAPI:
             "request": {
                 "context":{
                     "sdkVersion": "3.4.2",
-                    "utDid": "Z04QCLyb2HcDAF9vJb\/7q40r",
+                    "utDid": 'Z04QCLyb2HcDAF9vJb\/7q40r',
                     "platformName":"android",
                     "netType":"3g",
                     "appKey": self._app_key,
@@ -121,7 +122,7 @@ class NeakasaAPI:
                 }
             }
         }
-        response = client.do_request_raw(
+        response = await self.hass.async_add_executor_job(client.do_request_raw,
             '/api/prd/connect.json',
             'https',
             'POST',
@@ -171,7 +172,7 @@ class NeakasaAPI:
                 }
             }
         }
-        response = client.do_request_raw(
+        response = await self.hass.async_add_executor_job(client.do_request_raw,
             '/api/prd/loginbyoauth.json',
             'https',
             'POST',
@@ -201,7 +202,7 @@ class NeakasaAPI:
             },
             request=request
         )
-        response = client.do_request(
+        response = await self.hass.async_add_executor_job(client.do_request,
             '/account/createSessionByAuthCode',
             'https',
             'POST',
@@ -229,7 +230,7 @@ class NeakasaAPI:
             },
             request=request
         )
-        response = client.do_request(
+        response = await self.hass.async_add_executor_job(client.do_request,
             '/thing/productInfo/getByAppKey',
             'https',
             'POST',
@@ -260,7 +261,7 @@ class NeakasaAPI:
             },
             request=request
         )
-        response = client.do_request(
+        response = await self.hass.async_add_executor_job(client.do_request,
             '/uc/listBindingByAccount',
             'https',
             'POST',
@@ -289,7 +290,7 @@ class NeakasaAPI:
             request=request
         )
         # send request
-        response = client.do_request(
+        response = await self.hass.async_add_executor_job(client.do_request,
             '/thing/properties/get',
             'https',
             'POST',
@@ -318,7 +319,7 @@ class NeakasaAPI:
             },
             request=request
         )
-        client.do_request(
+        await self.hass.async_add_executor_job(client.do_request,
             '/thing/properties/set',
             'https',
             'POST',
@@ -346,7 +347,7 @@ class NeakasaAPI:
             },
             request=request
         )
-        client.do_request(
+        await self.hass.async_add_executor_job(client.do_request,
             '/thing/service/invoke',
             'https',
             'POST',
