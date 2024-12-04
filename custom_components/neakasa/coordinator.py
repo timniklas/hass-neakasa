@@ -95,6 +95,15 @@ class NeakasaCoordinator(DataUpdateCoordinator):
         devicedata = await self.api.getDeviceProperties(self.deviceid)
         self.async_set_updated_data(NeakasaCoordinator.mapObject(devicedata))
 
+    async def invokeService(self, service: str):
+        await self.api.connect(self.username, self.password)
+        match service:
+            case 'clean':
+                return await self.api.cleanNow(self.deviceid)
+            case 'level':
+                return await self.api.sandLeveling(self.deviceid)
+        raise Exception('cannot find service to invoke')
+
     async def async_update_data(self):
         """Fetch data from API endpoint.
 
