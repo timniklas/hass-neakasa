@@ -43,13 +43,7 @@ async def async_setup_entry(
             name=coordinator.devicename,
             manufacturer="Neakasa",
             identifiers={(DOMAIN, coordinator.deviceid)}
-        ), translation="bin_full_wait_reset", key="binFullWaitReset"),
-        NeakasaBinarySensor(coordinator, DeviceInfo(
-            identifiers={(DOMAIN, coordinator.deviceid)}
-        ), translation="bucket_status", key="bucketStatus"),
-        NeakasaBinarySensor(coordinator, DeviceInfo(
-            identifiers={(DOMAIN, coordinator.deviceid)}
-        ), translation="room_of_bin", key="room_of_bin", visible=False)
+        ), translation="bin_full", key="binFullWaitReset", visible=False, icon="mdi:delete-empty")
     ]
 
     # Create the sensors.
@@ -60,13 +54,15 @@ class NeakasaBinarySensor(CoordinatorEntity):
     _attr_should_poll = False
     _attr_has_entity_name = True
     
-    def __init__(self, coordinator: NeakasaCoordinator, deviceinfo: DeviceInfo, translation: str, key: str, visible: bool = True) -> None:
+    def __init__(self, coordinator: NeakasaCoordinator, deviceinfo: DeviceInfo, translation: str, key: str, icon: str = None, visible: bool = True) -> None:
         super().__init__(coordinator)
         self.device_info = deviceinfo
         self.data_key = key
         self.translation_key = translation
         self.entity_registry_enabled_default = visible
-        self.unique_id = f"{coordinator.deviceid}-{key}"
+        self._attr_unique_id = f"{coordinator.deviceid}-{translation}"
+        if icon is not None:
+            self._attr_icon = icon
 
     @callback
     def _handle_coordinator_update(self) -> None:
