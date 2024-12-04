@@ -24,9 +24,17 @@
         }
     },
     "entity": {
+        "button": {
+            "clean": {
+                "name": "Clean"
+            },
+            "level": {
+                "name": "Level"
+            }
+        },
         "binary_sensor": {
             "bin_full": {
-                "name": "garbage can full"
+                "name": "Garbage can full"
             }
         },
         "sensor": {
@@ -51,7 +59,7 @@
                 }
             },
             "sand_state": {
-                "name": "cat litter state",
+                "name": "Cat litter state",
                 "state": {
                     "insufficient": "Insufficient",
                     "moderate": "Moderate",
