@@ -1,0 +1,93 @@
+{
+    "title": "Neakasa",
+    "config": {
+        "step": {
+            "user": {
+                "title": "Neakasa Einrichtung",
+                "description": "Diese Anmeldeinformationen werden verwendet, um die Daten vom Server abzurufen.",
+                "data": {
+                    "username": "Benutzername",
+                    "password": "Kennwort"
+                }
+            },
+            "device": {
+                "description": "Wähle eins der Geräte aus.",
+                "data": {
+                    "device_id": "Geräte ID"
+                }
+            }
+        },
+        "abort": {
+            "connenction": "Fehler bei dem Verbindungsaufbau.",
+            "authentication": "Fehler bei der Authentifizierung.",
+            "unknown": "Unbekannter Fehler."
+        }
+    },
+    "entity": {
+        "binary_sensor": {
+            "bin_full": {
+                "name": "Abfalleimer voll"
+            }
+        },
+        "sensor": {
+            "sand_percent": {
+                "name": "Katzestreu Level"
+            },
+            "wifi_rssi": {
+                "name": "WiFi RSSI"
+            },
+            "stay_time": {
+                "name": "Letzte Aufenthaltszeit"
+            },
+            "last_usage": {
+                "name": "Letzte Benutzung"
+            },
+            "current_status": {
+                "name": "Geräte Status",
+                "state": {
+                    "idle": "Leerlauf",
+                    "cleaning": "Reinigung",
+                    "leveling": "Nivellierung"
+                }
+            },
+            "sand_state": {
+                "name": "Zustand Katzenstreu",
+                "state": {
+                    "insufficient": "Unzureichend",
+                    "moderate": "Mäßig",
+                    "sufficient": "Ausreichend"
+                }
+            },
+            "bin_state": {
+                "name": "Zustand Abfalleimer",
+                "state": {
+                    "normal": "Normal",
+                    "missing": "Nicht in Position"
+                }
+            }
+        },
+        "switch": {
+            "young_cat_mode": {
+                "name": "Kätzchen Modus"
+            },
+            "child_lock": {
+                "name": "Kindersicherung"
+            },
+            "auto_bury": {
+                "name": "Automatische Abdeckung"
+            },
+            "auto_level": {
+                "name": "Automatische Nivellierung"
+            },
+            "silent_mode": {
+                "name": "Stiller Modus"
+            },
+            "auto_recovery": {
+                "name": "Automatische Wiederherstellung"
+            },
+            "unstoppable_cycle": {
+                "name": "Unaufhaltsamer Kreislauf"
+            }
+        }
+    }
+}
