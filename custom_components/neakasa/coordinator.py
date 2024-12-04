@@ -11,6 +11,7 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
+from datetime import datetime
 
 from .api import NeakasaAPI, APIAuthError
 from .const import DOMAIN
@@ -23,14 +24,20 @@ class NeakasaAPIData:
     """Class to hold api data."""
 
     binFullWaitReset: bool
+    sandLevelState: int
     sandLevelPercent: int
-    bucketStatus: bool
-    room_of_bin: bool
+    bucketStatus: int
+    room_of_bin: int
     youngCatMode: bool
     childLockOnOff: bool
     autoBury: bool
     autoLevel: bool
     silentMode: bool
+    wifiRssi: int
+    autoForceInit: bool
+    bIntrptRangeDet: bool
+    stayTime: int
+    lastUse: int
 
 
 class NeakasaCoordinator(DataUpdateCoordinator):
@@ -55,28 +62,38 @@ class NeakasaCoordinator(DataUpdateCoordinator):
             # Method to call on every update interval.
             update_method=self.async_update_data,
             # Polling interval. Will only be polled if there are subscribers.
-            update_interval=timedelta(seconds=10),
+            update_interval=timedelta(seconds=60),
         )
 
         # Initialise api here
         self.api = NeakasaAPI(self.hass)
+
+    @staticmethod
+    def mapObject(devicedata: dict[str, any]):
+        return NeakasaAPIData(
+            binFullWaitReset=devicedata['binFullWaitReset']['value'] == 1, #-> Abfalleimer voll
+            youngCatMode=devicedata['youngCatMode']['value'] == 1, #-> Kätzchen Modus
+            childLockOnOff=devicedata['childLockOnOff']['value'] == 1, #-> Kindersicherung
+            autoBury=devicedata['autoBury']['value'] == 1, #-> automatische Abdeckung
+            autoLevel=devicedata['autoLevel']['value'] == 1, #-> automatische Nivellierung
+            silentMode=devicedata['silentMode']['value'] == 1, #-> Stiller Modus
+            autoForceInit=devicedata['autoForceInit']['value'] == 1, #-> automatische Wiederherstellung
+            bIntrptRangeDet=devicedata['bIntrptRangeDet']['value'] == 1, #-> Unaufhaltsamer Kreislauf
+            sandLevelPercent=devicedata['Sand']['value']['percent'], #-> Katzenstreu Prozent
+            wifiRssi=devicedata['NetWorkStatus']['value']['WiFi_RSSI'], #-> WLAN RSSI
+            bucketStatus=devicedata['bucketStatus']['value'], #-> Aktueller Status [0=Leerlauf,2=Reinigung,3=Nivellierung]
+            room_of_bin=devicedata['room_of_bin']['value'], #-> Abfalleimer [2=nicht in Position,0=Normal]
+            sandLevelState=devicedata['Sand']['value']['level'], #-> Katzenstreu [0=Unzureichend,1=Mäßig,2=Ausreichend]
+            stayTime=devicedata['catLeft']['value']['stayTime'],
+            lastUse=devicedata['catLeft']['time']
+        )
 
     async def setProperty(self, key: str, value: int):
         await self.api.connect(self.username, self.password)
         await self.api.setDeviceProperties(self.deviceid, {key: value})
         #update data
         devicedata = await self.api.getDeviceProperties(self.deviceid)
-        self.async_set_updated_data(NeakasaAPIData(
-            binFullWaitReset=devicedata['binFullWaitReset']['value'] == 1, #done
-            sandLevelPercent=devicedata['Sand']['value']['percent'], #done
-            bucketStatus=devicedata['bucketStatus']['value'] == 1, #done
-            room_of_bin=devicedata['room_of_bin']['value'] == 1, #done
-            youngCatMode=devicedata['youngCatMode']['value'] == 1, #done
-            childLockOnOff=devicedata['childLockOnOff']['value'] == 1, #done
-            autoBury=devicedata['autoBury']['value'] == 1, #done
-            autoLevel=devicedata['autoLevel']['value'] == 1, #done
-            silentMode=devicedata['silentMode']['value'] == 1 #done
-        ))
+        self.async_set_updated_data(NeakasaCoordinator.mapObject(devicedata))
 
     async def async_update_data(self):
         """Fetch data from API endpoint.
@@ -87,17 +104,7 @@ class NeakasaCoordinator(DataUpdateCoordinator):
         try:
             await self.api.connect(self.username, self.password)
             devicedata = await self.api.getDeviceProperties(self.deviceid)
-            return NeakasaAPIData(
-                binFullWaitReset=devicedata['binFullWaitReset']['value'] == 1, #done
-                sandLevelPercent=devicedata['Sand']['value']['percent'], #done
-                bucketStatus=devicedata['bucketStatus']['value'] == 1, #done
-                room_of_bin=devicedata['room_of_bin']['value'] == 1, #done
-                youngCatMode=devicedata['youngCatMode']['value'] == 1,
-                childLockOnOff=devicedata['childLockOnOff']['value'] == 1,
-                autoBury=devicedata['autoBury']['value'] == 1,
-                autoLevel=devicedata['autoLevel']['value'] == 1,
-                silentMode=devicedata['silentMode']['value'] == 1
-            )
+            return NeakasaCoordinator.mapObject(devicedata)
         except APIAuthError as err:
             _LOGGER.error(err)
             raise UpdateFailed(err) from err
