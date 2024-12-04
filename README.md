@@ -11,8 +11,7 @@
 
 The Neakasa Home Assistant Custom Integration allows you to integrate your Neakasa devices with your Home Assistant setup.
 
-![image](https://github.com/user-attachments/assets/59572f6e-442d-4698-a37f-2ea68c25a7ac)
-
+![image](https://github.com/user-attachments/assets/5dcec39f-2044-4b08-b0b0-e99a7b659eb4)
 
 ### Currently supported devices
 - Neakasa M1
