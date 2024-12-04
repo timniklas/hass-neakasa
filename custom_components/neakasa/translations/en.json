@@ -24,37 +24,69 @@
         }
     },
     "entity": {
-        "sensor": {
-            "sand_level_percent": {
-                "name": "Sand level"
+        "binary_sensor": {
+            "bin_full": {
+                "name": "garbage can full"
             }
         },
-        "binary_sensor": {
-            "bin_full_wait_reset": {
-                "name": "Bin full"
+        "sensor": {
+            "sand_percent": {
+                "name": "Cat litter level"
             },
-            "bucket_status": {
-                "name": "Bucket status"
+            "wifi_rssi": {
+                "name": "WiFi RSSI"
             },
-            "room_of_bin": {
-                "name": "Room of bin"
+            "stay_time": {
+                "name": "Last stay time"
+            },
+            "last_usage": {
+                "name": "Device status"
+            },
+            "current_status": {
+                "name": "Geräte Status",
+                "state": {
+                    "idle": "Idle",
+                    "cleaning": "Cleaning",
+                    "leveling": "Leveling"
+                }
+            },
+            "sand_state": {
+                "name": "cat litter state",
+                "state": {
+                    "insufficient": "Insufficient",
+                    "moderate": "Moderate",
+                    "sufficient": "Sufficient"
+                }
+            },
+            "bin_state": {
+                "name": "Bin state",
+                "state": {
+                    "normal": "Normal",
+                    "missing": "Not in position"
+                }
             }
         },
         "switch": {
             "young_cat_mode": {
-                "name": "Young cat mode"
+                "name": "Kitten mode"
             },
-            "child_lock_on_off": {
+            "child_lock": {
                 "name": "Child lock"
             },
             "auto_bury": {
-                "name": "Auto bury"
+                "name": "Automatic cover"
             },
             "auto_level": {
-                "name": "Auto level"
+                "name": "Automatic leveling"
             },
             "silent_mode": {
-                "name": "Silent Mode"
+                "name": "Silent mode"
+            },
+            "auto_recovery": {
+                "name": "Automatic recovery"
+            },
+            "unstoppable_cycle": {
+                "name": "Unstoppable cycle"
             }
         }
     }
