@@ -39,7 +39,7 @@
         },
         "sensor": {
             "sand_percent": {
-                "name": "Katzestreu Level"
+                "name": "Katzenstreu Level"
             },
             "wifi_rssi": {
                 "name": "WiFi RSSI"
