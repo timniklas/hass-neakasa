@@ -46,7 +46,7 @@ async def async_setup_entry(
         ), translation="last_usage", key="lastUse"),
         NeakasaMapSensor(coordinator, DeviceInfo(
             identifiers={(DOMAIN, coordinator.deviceid)}
-        ), translation="current_status", key="bucketStatus", options=['idle', None, 'cleaning', 'leveling'], icon="mdi:state-machine"),
+        ), translation="current_status", key="bucketStatus", options=['idle', 'cleaning', 'cleaning', 'leveling'], icon="mdi:state-machine"),
         NeakasaMapSensor(coordinator, DeviceInfo(
             identifiers={(DOMAIN, coordinator.deviceid)}
         ), translation="sand_state", key="sandLevelState", options=['insufficient', 'moderate', 'sufficient']),
