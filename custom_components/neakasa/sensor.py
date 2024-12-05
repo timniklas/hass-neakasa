@@ -81,6 +81,12 @@ class NeakasaSensor(CoordinatorEntity):
     @property
     def state(self):
         return getattr(self.coordinator.data, self.data_key)
+    
+    @property
+    def extra_state_attributes(self):
+        return {
+            "state_class": SensorStateClass.MEASUREMENT
+        }
 
 class NeakasaMapSensor(CoordinatorEntity):
     
