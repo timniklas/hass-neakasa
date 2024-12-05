@@ -9,8 +9,7 @@ from homeassistant.components.binary_sensor import (
     BinarySensorEntity,
 )
 from homeassistant.const import (
-    STATE_ON,
-    STATE_OFF,
+    STATE_STANDBY
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
@@ -71,3 +70,7 @@ class NeakasaButton(CoordinatorEntity):
 
     async def _async_press_action(self) -> None:
         await self.coordinator.invokeService(self.service_key)
+    
+    @property
+    def state(self):
+        return STATE_STANDBY
