@@ -70,6 +70,7 @@
                 "name": "Zustand Abfalleimer",
                 "state": {
                     "normal": "Normal",
+                    "full": "Bitte leeren",
                     "missing": "Nicht in Position"
                 }
             }
