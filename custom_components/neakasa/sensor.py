@@ -52,7 +52,7 @@ async def async_setup_entry(
         ), translation="sand_state", key="sandLevelState", options=['insufficient', 'moderate', 'sufficient']),
         NeakasaMapSensor(coordinator, DeviceInfo(
             identifiers={(DOMAIN, coordinator.deviceid)}
-        ), translation="bin_state", key="room_of_bin", options=['normal', None, 'missing'], icon="mdi:delete")
+        ), translation="bin_state", key="room_of_bin", options=['normal', 'full', 'missing'], icon="mdi:delete")
     ]
 
     # Create the sensors.
