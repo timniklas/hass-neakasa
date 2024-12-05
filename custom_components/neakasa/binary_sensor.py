@@ -9,8 +9,8 @@ from homeassistant.components.binary_sensor import (
     BinarySensorEntity,
 )
 from homeassistant.const import (
-    STATE_ON,
-    STATE_OFF,
+    STATE_OK,
+    STATE_PROBLEM,
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
@@ -75,4 +75,4 @@ class NeakasaBinarySensor(CoordinatorEntity):
     
     @property
     def state(self):
-        return STATE_ON if self.is_on else STATE_OFF
+        return STATE_OK if self.is_on else STATE_PROBLEM
