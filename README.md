@@ -11,10 +11,42 @@
 
 The Neakasa Home Assistant Custom Integration allows you to integrate your Neakasa devices with your Home Assistant setup.
 
-![image](https://github.com/user-attachments/assets/38c3d1ce-10aa-459a-8c7e-c1b5fab7b9f1)
-
 ### Currently supported devices
 - Neakasa M1
+
+### Currently supported features
+#### Sensors:
+|Sensor|Unit|Example Value|Enabled by default|
+|------|-------------|------|------|
+|Cat litter level|percent|80 %|yes|
+|WiFi RSS|dB|-60 dB|no|
+|Last stay time|seconds|45 s|no|
+|Last usage|datetime|2024-12-07 14:52|yes|
+|Device status|idle / cleaning/ leveling|idle|yes|
+|Cat litter state|insufficient / moderate / sufficient|sufficient|yes|
+|Bin state|normal / full / missing|normal|yes|
+
+#### Binary sensors:
+|Binary Sensor|Example Value|Enabled by default|
+|-------------|-------------|------------------|
+|Garbage can full|off|yes|
+
+#### Buttons:
+|Button|Action|Enabled by default|
+|------|------|------------------|
+|Clean|Cleans the litter box|yes|
+|Level|Initiates the leveling process|yes|
+
+#### Switches:
+|Switch|Enabled by default|
+|------|------------------|
+|Kitten mode|no|
+|Child lock|yes|
+|Automatic cover|yes|
+|Automatic leveling|yes|
+|Silent mode|yes|
+|Automatic recovery|no|
+|Unstoppable cycle|yes|
 
 ## Installation
 
