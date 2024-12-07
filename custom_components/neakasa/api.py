@@ -59,7 +59,6 @@ class NeakasaAPI:
             }) as response:
                 response.raise_for_status()
                 response_json = await response.json()
-                self.connected = True
                 return response_json['data']['user_info']['ali_authentication_token']
         except ClientResponseError as exc:
             raise APIAuthError("Error connecting to api. Invalid username or password.")
