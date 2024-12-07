@@ -51,7 +51,7 @@ class NeakasaAPI:
                 "Sign": signature,
             }) as response:
                 response_json = await response.json()
-                if response_json['code'] != 200:
+                if response_json['code'] != 0:
                     raise APIAuthError("Error connecting to api. Invalid username or password.")
                 self.baseurl = response_json['data']['web']
         except ClientError as exc:
@@ -81,7 +81,7 @@ class NeakasaAPI:
                 "Sign": signature,
             }) as response:
                 response_json = await response.json()
-                if response_json['code'] != 200:
+                if response_json['code'] != 0:
                     raise APIAuthError("Error connecting to api. Invalid username or password.")
                 return response_json['data']['user_info']['ali_authentication_token']
         except ClientError as exc:
