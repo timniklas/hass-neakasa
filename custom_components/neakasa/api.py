@@ -73,7 +73,7 @@ class NeakasaAPI:
                     "app_version": "2.0.9",
                     "account": username,
                     "type": 3,
-                    "password": password
+                    "password": hashlib.md5(hashlib.md5(password.encode()).hexdigest().encode()).hexdigest() #hash twice
                 },
                 headers={
                 "Request-Id": signature,
