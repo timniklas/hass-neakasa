@@ -27,6 +27,7 @@ class NeakasaAPI:
 
     async def connect(self, username: str, password: str):
         deviceId = str(uuid.uuid4())
+        await self._loadBaseUrlByAccount(username)
         self._ali_authentication_token = await self._getAuthToken(username, password)
         await self._loadRegionData()
         vid = await self._getVid()
@@ -34,13 +35,37 @@ class NeakasaAPI:
         self._iotToken = await self._getIotTokenBySid(sid)
         self.connected = True
     
+    async def _loadBaseUrlByAccount(self, username: str):
+        try:
+            timestamp = str(int(time.time()))
+            signature_raw = hmac.new(self._app_secret.encode(), (self._app_key + timestamp).encode(), digestmod=hashlib.sha256)
+            signature = base64.b64encode(signature_raw.digest()).decode("utf-8")
+            async with self._session.get(
+                url='https://global.genhigh.com/global/baseurl/account',
+                params={
+                    "account": hashlib.md5(username.encode()).hexdigest()
+                },
+                headers={
+                "Request-Id": signature,
+                "Appid": self._app_key,
+                "Timestamp": timestamp,
+                "Sign": signature,
+            }) as response:
+                response.raise_for_status()
+                response_json = await response.json()
+                self.baseurl = response_json['data']['web']
+        except ClientResponseError as exc:
+            raise APIAuthError("Error connecting to api. Invalid username or password.")
+        except ClientError as exc:
+            raise APIConnectionError("Error connecting to api.")
+    
     async def _getAuthToken(self, username: str, password: str):
         try:
             timestamp = str(int(time.time()))
             signature_raw = hmac.new(self._app_secret.encode(), (self._app_key + timestamp).encode(), digestmod=hashlib.sha256)
             signature = base64.b64encode(signature_raw.digest()).decode("utf-8")
             async with self._session.post(
-                url='https://eu.neakasa.com/api/login/user',
+                url=self.baseurl + '/login/user',
                 json={
                     "product_id": "a123nCqsrQm3vEbt",
                     "system": 2,
