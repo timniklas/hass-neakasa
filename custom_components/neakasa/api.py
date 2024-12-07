@@ -16,10 +16,9 @@ import uuid
 #############################
 
 class NeakasaAPI:
-    def __init__(self, hass: HomeAssistant, app_key: str = "32715650", app_secret: str = "698ee0ef531c3df2ddded87563643860", country = "DE", language = "en-US") -> None:
+    def __init__(self, hass: HomeAssistant, app_key: str = "32715650", app_secret: str = "698ee0ef531c3df2ddded87563643860", language = "en-US") -> None:
         self._app_key = app_key
         self._app_secret = app_secret
-        self._country = country
         self._language = language
         self._session = async_get_clientsession(hass)
         self.hass = hass
@@ -102,8 +101,7 @@ class NeakasaAPI:
             version="1.0",
             params={
                 "authCode": self._ali_authentication_token,
-                "type": "THIRD_AUTHCODE",
-                "countryCode": self._country
+                "type": "THIRD_AUTHCODE"
             },
             request=request
         )
@@ -173,7 +171,6 @@ class NeakasaAPI:
         }
         body = {
             "loginByOauthRequest": {
-                "country": self._country,
                 "authCode": self._ali_authentication_token,
                 "oauthPlateform": 23,
                 "oauthAppKey": self._app_key,
