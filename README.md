@@ -19,7 +19,7 @@ The Neakasa Home Assistant Custom Integration allows you to integrate your Neaka
 |Sensor|Unit|Example Value|Enabled by default|
 |------|-------------|------|------|
 |Cat litter level|percent|80 %|yes|
-|WiFi RSS|dB|-60 dB|no|
+|WiFi RSS|dB|-60 dB|no (debug information)|
 |Last stay time|seconds|45 s|no|
 |Last usage|datetime|2024-12-07 14:52|yes|
 |Device status|idle / cleaning/ leveling|idle|yes|
@@ -40,12 +40,12 @@ The Neakasa Home Assistant Custom Integration allows you to integrate your Neaka
 #### Switches:
 |Switch|Enabled by default|
 |------|------------------|
-|Kitten mode|no|
+|Kitten mode|no (rare edgecase)|
 |Child lock|yes|
 |Automatic cover|yes|
 |Automatic leveling|yes|
 |Silent mode|yes|
-|Automatic recovery|no|
+|Automatic recovery|no (potentialy dangerous!)|
 |Unstoppable cycle|yes|
 
 ## Installation
