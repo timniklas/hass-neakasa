@@ -51,7 +51,7 @@
                 "name": "Device status"
             },
             "current_status": {
-                "name": "Geräte Status",
+                "name": "Device status",
                 "state": {
                     "idle": "Idle",
                     "cleaning": "Cleaning",
