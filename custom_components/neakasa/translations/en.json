@@ -48,7 +48,7 @@
                 "name": "Last stay time"
             },
             "last_usage": {
-                "name": "Device status"
+                "name": "Last usage"
             },
             "current_status": {
                 "name": "Device status",
