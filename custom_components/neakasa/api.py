@@ -125,25 +125,13 @@ class NeakasaAPI:
         body = {
             "request": {
                 "context":{
-                    "sdkVersion": "3.4.2",
-                    "utDid": 'Z04QCLyb2HcDAF9vJb\/7q40r',
-                    "platformName":"android",
-                    "netType":"3g",
-                    "appKey": self._app_key,
-                    "yunOSId": "",
-                    "appVersion": "2.0.9",
-                    "appAuthToken": "",
-                    "securityToken": ""
+                    "appKey": self._app_key
                 },
                 "config":{
                     "version":0,
                     "lastModify":0
                 },
-                "device":{
-                    "model":"sdk_gphone64_x86_64",
-                    "brand":"goldfish_x86_64",
-                    "platformVersion":"34"
-                }
+                "device":{}
             }
         }
         response = await self.hass.async_add_executor_job(client.do_request_raw,
@@ -172,27 +160,7 @@ class NeakasaAPI:
                 "authCode": self._ali_authentication_token,
                 "oauthPlateform": 23,
                 "oauthAppKey": self._app_key,
-                "riskControlInfo":{
-                    "appVersion": "200090001",
-                    "USE_OA_PWD_ENCRYPT": "true",
-                    "utdid": "ffffffffffffffffffffffff",
-                    "netType": "wifi",
-                    "umidToken": "",
-                    "locale": self._language,
-                    "appVersionName": "2.0.9",
-                    "deviceId": deviceId,
-                    "routerMac": "02:00:00:00:00:00",
-                    "platformVersion": "34",
-                    "appAuthToken": "",
-                    "appID": "com.jhkj.neakasa",
-                    "signType": "RSA",
-                    "sdkVersion": "3.4.2",
-                    "model": "sdk_gphone64_x86_64",
-                    "USE_H5_NC": "true",
-                    "platformName": "android",
-                    "brand": "google",
-                    "yunOSId": ""
-                }
+                "riskControlInfo":{ }
             }
         }
         response = await self.hass.async_add_executor_job(client.do_request_raw,
