@@ -1,10 +1,8 @@
 import json
 from alibabacloud_iot_api_gateway.models import Config, IoTApiRequest, CommonParams
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from aiohttp import ClientError, ClientResponseError
+from aiohttp import ClientError
 from .client import Client
 from alibabacloud_tea_util.models import RuntimeOptions
-from homeassistant.core import HomeAssistant
 import time
 import hmac
 import hashlib
@@ -15,13 +13,17 @@ import uuid
 # Neakasa API by @timniklas #
 #############################
 
+#for debug only
+async def async_add_executor_job(target, *args):
+    return target(*args)
+
 class NeakasaAPI:
-    def __init__(self, hass: HomeAssistant, app_key: str = "32715650", app_secret: str = "698ee0ef531c3df2ddded87563643860", language = "en-US") -> None:
+    def __init__(self, session, async_executor = async_add_executor_job, app_key: str = "32715650", app_secret: str = "698ee0ef531c3df2ddded87563643860", language = "en-US") -> None:
         self._app_key = app_key
         self._app_secret = app_secret
         self._language = language
-        self._session = async_get_clientsession(hass)
-        self.hass = hass
+        self._session = session
+        self._async_executor = async_executor
         self.connected: bool = False
 
     async def connect(self, username: str, password: str):
@@ -103,7 +105,7 @@ class NeakasaAPI:
             },
             request=request
         )
-        response = await self.hass.async_add_executor_job(client.do_request,
+        response = await self._async_executor(client.do_request,
             '/living/account/region/get',
             'https',
             'POST',
@@ -134,7 +136,7 @@ class NeakasaAPI:
                 "device":{}
             }
         }
-        response = await self.hass.async_add_executor_job(client.do_request_raw,
+        response = await self._async_executor(client.do_request_raw,
             '/api/prd/connect.json',
             'https',
             'POST',
@@ -163,7 +165,7 @@ class NeakasaAPI:
                 "riskControlInfo":{ }
             }
         }
-        response = await self.hass.async_add_executor_job(client.do_request_raw,
+        response = await self._async_executor(client.do_request_raw,
             '/api/prd/loginbyoauth.json',
             'https',
             'POST',
@@ -193,7 +195,7 @@ class NeakasaAPI:
             },
             request=request
         )
-        response = await self.hass.async_add_executor_job(client.do_request,
+        response = await self._async_executor(client.do_request,
             '/account/createSessionByAuthCode',
             'https',
             'POST',
@@ -221,7 +223,7 @@ class NeakasaAPI:
             },
             request=request
         )
-        response = await self.hass.async_add_executor_job(client.do_request,
+        response = await self._async_executor(client.do_request,
             '/thing/productInfo/getByAppKey',
             'https',
             'POST',
@@ -252,7 +254,7 @@ class NeakasaAPI:
             },
             request=request
         )
-        response = await self.hass.async_add_executor_job(client.do_request,
+        response = await self._async_executor(client.do_request,
             '/uc/listBindingByAccount',
             'https',
             'POST',
@@ -281,7 +283,7 @@ class NeakasaAPI:
             request=request
         )
         # send request
-        response = await self.hass.async_add_executor_job(client.do_request,
+        response = await self._async_executor(client.do_request,
             '/thing/properties/get',
             'https',
             'POST',
@@ -310,7 +312,7 @@ class NeakasaAPI:
             },
             request=request
         )
-        await self.hass.async_add_executor_job(client.do_request,
+        await self._async_executor(client.do_request,
             '/thing/properties/set',
             'https',
             'POST',
@@ -338,7 +340,7 @@ class NeakasaAPI:
             },
             request=request
         )
-        await self.hass.async_add_executor_job(client.do_request,
+        await self._async_executor(client.do_request,
             '/thing/service/invoke',
             'https',
             'POST',

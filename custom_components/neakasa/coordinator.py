@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from datetime import timedelta
 import logging
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
@@ -66,7 +67,8 @@ class NeakasaCoordinator(DataUpdateCoordinator):
         )
 
         # Initialise api here
-        self.api = NeakasaAPI(self.hass)
+        session = async_get_clientsession(hass)
+        self.api = NeakasaAPI(session, self.hass.async_add_executor_job)
 
     @staticmethod
     def mapObject(devicedata: dict[str, any]):
