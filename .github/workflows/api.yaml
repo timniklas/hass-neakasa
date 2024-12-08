@@ -1,0 +1,16 @@
+name: Test API
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "0 0 * * *"
+
+jobs:
+  hacs:
+    name: Test API
+    runs-on: "ubuntu-latest"
+    steps:
+        - uses: actions/checkout@v4
+        - uses: actions/setup-python@v5
+        - run: python test.py
