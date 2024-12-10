@@ -55,7 +55,8 @@
                 "state": {
                     "idle": "Leerlauf",
                     "cleaning": "Reinigung",
-                    "leveling": "Nivellierung"
+                    "leveling": "Nivellierung",
+                    "overfilled": "Überschuss"
                 }
             },
             "sand_state": {
