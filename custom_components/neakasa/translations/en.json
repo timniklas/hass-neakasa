@@ -63,7 +63,8 @@
                 "state": {
                     "insufficient": "Insufficient",
                     "moderate": "Moderate",
-                    "sufficient": "Sufficient"
+                    "sufficient": "Sufficient",
+                    "overfilled": "Overfilled"
                 }
             },
             "bin_state": {
