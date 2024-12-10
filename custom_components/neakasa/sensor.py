@@ -49,7 +49,7 @@ async def async_setup_entry(
         ), translation="current_status", key="bucketStatus", options=['idle', 'cleaning', 'cleaning', 'leveling'], icon="mdi:state-machine"),
         NeakasaMapSensor(coordinator, DeviceInfo(
             identifiers={(DOMAIN, coordinator.deviceid)}
-        ), translation="sand_state", key="sandLevelState", options=['insufficient', 'moderate', 'sufficient']),
+        ), translation="sand_state", key="sandLevelState", options=['insufficient', 'moderate', 'sufficient', 'overfilled']),
         NeakasaMapSensor(coordinator, DeviceInfo(
             identifiers={(DOMAIN, coordinator.deviceid)}
         ), translation="bin_state", key="room_of_bin", options=['normal', 'full', 'missing'], icon="mdi:delete")
