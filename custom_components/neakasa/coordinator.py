@@ -13,7 +13,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from datetime import datetime
 
-from .api import NeakasaAPI, APIAuthError
+from .api import NeakasaAPI, APIAuthError, APIConnectionError
 from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
@@ -117,6 +117,10 @@ class NeakasaCoordinator(DataUpdateCoordinator):
         except APIAuthError as err:
             _LOGGER.error(err)
             raise UpdateFailed(err) from err
+        except APIConnectionError as err:
+            _LOGGER.error(err)
+            raise UpdateFailed(err) from err
         except Exception as err:
+            _LOGGER.error(err)
             # This will show entities as unavailable by raising UpdateFailed exception
             raise UpdateFailed(f"Error communicating with API: {err}") from err
