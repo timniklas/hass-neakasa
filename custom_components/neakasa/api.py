@@ -113,7 +113,7 @@ class NeakasaAPI:
         )
         response_data = json.loads(response.body)
         if response_data['code'] != 200:
-            raise APIConnectionError("Error loading region data." + str(response_data['code']))
+            raise APIConnectionError("Error loading region data." + response_data['message'])
         self.oaApiGatewayEndpoint = response_data['data']['oaApiGatewayEndpoint']
         self.apiGatewayEndpoint = response_data['data']['apiGatewayEndpoint']
     
@@ -205,7 +205,7 @@ class NeakasaAPI:
         )
         response_data = json.loads(response.body)
         if response_data['code'] != 200:
-            raise APIConnectionError("Error getting iot token: " + str(response_data['code']))
+            raise APIConnectionError("Error getting iot token: " + response_data['message'])
         return response_data['data']['iotToken']
 
     async def getProductList(self):
@@ -235,7 +235,7 @@ class NeakasaAPI:
         )
         response_data = json.loads(response.body)
         if response_data['code'] != 200:
-            raise APIConnectionError("Error getting product list: " + str(response_data['code']))
+            raise APIConnectionError("Error getting product list: " + response_data['message'])
         return response_data['data']
 
     async def getDevices(self, pageNo: int = 1, pageSize: int = 20):
@@ -268,7 +268,7 @@ class NeakasaAPI:
         )
         response_data = json.loads(response.body)
         if response_data['code'] != 200:
-            raise APIConnectionError("Error getting devices: " + str(response_data['code']))
+            raise APIConnectionError("Error getting devices: " + response_data['message'])
         return response_data['data']['data']
 
     async def getDeviceProperties(self, iotId: str):
@@ -299,7 +299,7 @@ class NeakasaAPI:
         )
         response_data = json.loads(response.body)
         if response_data['code'] != 200:
-            raise APIConnectionError("Error getting device properties: " + str(response_data['code']))
+            raise APIConnectionError("Error getting device properties: " + response_data['message'])
         return response_data['data']
 
     async def setDeviceProperties(self, iotId: str, items: dict[str, any]):
