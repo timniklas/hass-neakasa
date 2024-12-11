@@ -145,6 +145,10 @@ class NeakasaAPI:
             RuntimeOptions()
         )
         response_data = json.loads(response.body)
+        if response_data['success'] != 'true':
+            raise APIConnectionError("Error getting vid.")
+        if response_data['data']['successful'] != 'true':
+            raise APIConnectionError("Error getting vid: " + response_data['data']['message'])
         return response_data['data']['vid']
 
     async def _getSidByVid(self, vid: str, deviceId: str):
@@ -174,6 +178,10 @@ class NeakasaAPI:
             RuntimeOptions()
         )
         response_data = json.loads(response.body)
+        if response_data['success'] != 'true':
+            raise APIAuthError("Error getting sid: " + response_data['errorMsg'])
+        if response_data['data']['successful'] != 'true':
+            raise APIAuthError("Error getting sid: " + response_data['data']['message'])
         return response_data['data']['data']['loginSuccessResult']['sid']
 
     async def _getIotTokenBySid(self, sid: str):
@@ -205,7 +213,7 @@ class NeakasaAPI:
         )
         response_data = json.loads(response.body)
         if response_data['code'] != 200:
-            raise APIConnectionError("Error getting iot token: " + response_data['message'])
+            raise APIAuthError("Error getting iot token: " + response_data['message'])
         return response_data['data']['iotToken']
 
     async def getProductList(self):
