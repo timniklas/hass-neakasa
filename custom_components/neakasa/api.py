@@ -111,9 +111,11 @@ class NeakasaAPI:
             body,
             RuntimeOptions()
         )
-        json_body = json.loads(response.body)
-        self.oaApiGatewayEndpoint = json_body['data']['oaApiGatewayEndpoint']
-        self.apiGatewayEndpoint = json_body['data']['apiGatewayEndpoint']
+        response_data = json.loads(response.body)
+        if response_data['code'] != 200:
+            raise APIConnectionError("Error loading region data.")
+        self.oaApiGatewayEndpoint = response_data['data']['oaApiGatewayEndpoint']
+        self.apiGatewayEndpoint = response_data['data']['apiGatewayEndpoint']
     
     async def _getVid(self):
         config = Config(
@@ -202,6 +204,8 @@ class NeakasaAPI:
             RuntimeOptions()
         )
         response_data = json.loads(response.body)
+        if response_data['code'] != 200:
+            raise APIConnectionError("Error getting iot token: " str(response_data['code']))
         return response_data['data']['iotToken']
 
     async def getProductList(self):
@@ -230,6 +234,8 @@ class NeakasaAPI:
             RuntimeOptions()
         )
         response_data = json.loads(response.body)
+        if response_data['code'] != 200:
+            raise APIConnectionError("Error getting product list: " str(response_data['code']))
         return response_data['data']
 
     async def getDevices(self, pageNo: int = 1, pageSize: int = 20):
@@ -261,6 +267,8 @@ class NeakasaAPI:
             RuntimeOptions()
         )
         response_data = json.loads(response.body)
+        if response_data['code'] != 200:
+            raise APIConnectionError("Error getting devices: " str(response_data['code']))
         return response_data['data']['data']
 
     async def getDeviceProperties(self, iotId: str):
@@ -290,6 +298,8 @@ class NeakasaAPI:
             RuntimeOptions()
         )
         response_data = json.loads(response.body)
+        if response_data['code'] != 200:
+            raise APIConnectionError("Error getting device properties: " str(response_data['code']))
         return response_data['data']
 
     async def setDeviceProperties(self, iotId: str, items: dict[str, any]):
