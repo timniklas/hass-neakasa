@@ -24,15 +24,21 @@ class NeakasaAPI:
         self.hass = hass
         self.connected: bool = False
 
-    async def connect(self, username: str, password: str):
+    async def connect(self, username: str, password: str, firstRun: bool = True):
         if self.connected == False:
             await self._loadBaseUrlByAccount(username)
             self._ali_authentication_token = await self._getAuthToken(username, password)
             await self._loadRegionData()
             vid = await self._getVid()
-            sid = await self._getSidByVid(vid)
-        self._iotToken = await self._getIotTokenBySid(sid)
-        self.connected = True
+            self._sid = await self._getSidByVid(vid)
+        try:
+            self._iotToken = await self._getIotTokenBySid(self._sid)
+            self.connected = True
+        except APIAuthError as exc:
+            if firstRun:
+                await self.connect(username, password, False)
+            else:
+                raise exc
     
     async def _loadBaseUrlByAccount(self, username: str):
         try:
