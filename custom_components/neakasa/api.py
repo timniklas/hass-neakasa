@@ -24,15 +24,21 @@ class NeakasaAPI:
         self.hass = hass
         self.connected: bool = False
 
-    async def connect(self, username: str, password: str):
-        deviceId = str(uuid.uuid4())
-        await self._loadBaseUrlByAccount(username)
-        self._ali_authentication_token = await self._getAuthToken(username, password)
-        await self._loadRegionData()
-        vid = await self._getVid()
-        sid = await self._getSidByVid(vid, deviceId)
-        self._iotToken = await self._getIotTokenBySid(sid)
-        self.connected = True
+    async def connect(self, username: str, password: str, firstRun: bool = True):
+        if self.connected == False:
+            await self._loadBaseUrlByAccount(username)
+            self._ali_authentication_token = await self._getAuthToken(username, password)
+            await self._loadRegionData()
+            vid = await self._getVid()
+            self._sid = await self._getSidByVid(vid)
+        try:
+            self._iotToken = await self._getIotTokenBySid(self._sid)
+            self.connected = True
+        except APIAuthError as exc:
+            if firstRun:
+                await self.connect(username, password, False)
+            else:
+                raise exc
     
     async def _loadBaseUrlByAccount(self, username: str):
         try:
@@ -151,7 +157,7 @@ class NeakasaAPI:
             raise APIConnectionError("Error getting vid: " + response_data['data']['message'])
         return response_data['data']['vid']
 
-    async def _getSidByVid(self, vid: str, deviceId: str):
+    async def _getSidByVid(self, vid: str):
         config = Config(
             app_key=self._app_key,
             app_secret=self._app_secret,
@@ -213,6 +219,7 @@ class NeakasaAPI:
         )
         response_data = json.loads(response.body)
         if response_data['code'] != 200:
+            self.connected = False
             raise APIAuthError("Error getting iot token: " + response_data['message'])
         return response_data['data']['iotToken']
 
