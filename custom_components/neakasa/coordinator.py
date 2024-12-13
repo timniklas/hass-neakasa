@@ -62,38 +62,19 @@ class NeakasaCoordinator(DataUpdateCoordinator):
             # Method to call on every update interval.
             update_method=self.async_update_data,
             # Polling interval. Will only be polled if there are subscribers.
-            update_interval=timedelta(seconds=15),
+            update_interval=timedelta(seconds=60),
         )
 
         # Initialise api here
         self.api = NeakasaAPI(self.hass)
-
-    @staticmethod
-    def mapObject(devicedata: dict[str, any]):
-        return NeakasaAPIData(
-            binFullWaitReset=devicedata['binFullWaitReset']['value'] == 1, #-> Abfalleimer voll
-            youngCatMode=devicedata['youngCatMode']['value'] == 1, #-> Kätzchen Modus
-            childLockOnOff=devicedata['childLockOnOff']['value'] == 1, #-> Kindersicherung
-            autoBury=devicedata['autoBury']['value'] == 1, #-> automatische Abdeckung
-            autoLevel=devicedata['autoLevel']['value'] == 1, #-> automatische Nivellierung
-            silentMode=devicedata['silentMode']['value'] == 1, #-> Stiller Modus
-            autoForceInit=devicedata['autoForceInit']['value'] == 1, #-> automatische Wiederherstellung
-            bIntrptRangeDet=devicedata['bIntrptRangeDet']['value'] == 1, #-> Unaufhaltsamer Kreislauf
-            sandLevelPercent=devicedata['Sand']['value']['percent'], #-> Katzenstreu Prozent
-            wifiRssi=devicedata['NetWorkStatus']['value']['WiFi_RSSI'], #-> WLAN RSSI
-            bucketStatus=devicedata['bucketStatus']['value'], #-> Aktueller Status [0=Leerlauf,2=Reinigung,3=Nivellierung]
-            room_of_bin=devicedata['room_of_bin']['value'], #-> Abfalleimer [2=nicht in Position,0=Normal]
-            sandLevelState=devicedata['Sand']['value']['level'], #-> Katzenstreu [0=Unzureichend,1=Mäßig,2=Ausreichend]
-            stayTime=devicedata['catLeft']['value']['stayTime'],
-            lastUse=devicedata['catLeft']['time']
-        )
+        
 
     async def setProperty(self, key: str, value: int):
         await self.api.connect(self.username, self.password)
         await self.api.setDeviceProperties(self.deviceid, {key: value})
         #update data
-        devicedata = await self.api.getDeviceProperties(self.deviceid)
-        self.async_set_updated_data(NeakasaCoordinator.mapObject(devicedata))
+        setattr(self.data, key, value)
+        self.async_set_updated_data(self.data)
 
     async def invokeService(self, service: str):
         await self.api.connect(self.username, self.password)
@@ -113,7 +94,23 @@ class NeakasaCoordinator(DataUpdateCoordinator):
         try:
             await self.api.connect(self.username, self.password)
             devicedata = await self.api.getDeviceProperties(self.deviceid)
-            return NeakasaCoordinator.mapObject(devicedata)
+            return NeakasaAPIData(
+                binFullWaitReset=devicedata['binFullWaitReset']['value'] == 1, #-> Abfalleimer voll
+                youngCatMode=devicedata['youngCatMode']['value'] == 1, #-> Kätzchen Modus
+                childLockOnOff=devicedata['childLockOnOff']['value'] == 1, #-> Kindersicherung
+                autoBury=devicedata['autoBury']['value'] == 1, #-> automatische Abdeckung
+                autoLevel=devicedata['autoLevel']['value'] == 1, #-> automatische Nivellierung
+                silentMode=devicedata['silentMode']['value'] == 1, #-> Stiller Modus
+                autoForceInit=devicedata['autoForceInit']['value'] == 1, #-> automatische Wiederherstellung
+                bIntrptRangeDet=devicedata['bIntrptRangeDet']['value'] == 1, #-> Unaufhaltsamer Kreislauf
+                sandLevelPercent=devicedata['Sand']['value']['percent'], #-> Katzenstreu Prozent
+                wifiRssi=devicedata['NetWorkStatus']['value']['WiFi_RSSI'], #-> WLAN RSSI
+                bucketStatus=devicedata['bucketStatus']['value'], #-> Aktueller Status [0=Leerlauf,2=Reinigung,3=Nivellierung]
+                room_of_bin=devicedata['room_of_bin']['value'], #-> Abfalleimer [2=nicht in Position,0=Normal]
+                sandLevelState=devicedata['Sand']['value']['level'], #-> Katzenstreu [0=Unzureichend,1=Mäßig,2=Ausreichend]
+                stayTime=devicedata['catLeft']['value']['stayTime'],
+                lastUse=devicedata['catLeft']['time']
+            )
         except APIAuthError as err:
             _LOGGER.error(err)
             raise UpdateFailed(err) from err
