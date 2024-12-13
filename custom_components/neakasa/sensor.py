@@ -9,7 +9,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
-from homeassistant.const import PERCENTAGE, SIGNAL_STRENGTH_DECIBELS, UnitOfTime
+from homeassistant.const import PERCENTAGE, SIGNAL_STRENGTH_DECIBELS, UnitOfTime, EntityCategory
 from datetime import datetime
 
 from .const import DOMAIN
@@ -37,7 +37,7 @@ async def async_setup_entry(
         ), translation="sand_percent", key="sandLevelPercent", unit=PERCENTAGE),
         NeakasaSensor(coordinator, DeviceInfo(
             identifiers={(DOMAIN, coordinator.deviceid)}
-        ), translation="wifi_rssi", key="wifiRssi", unit=SIGNAL_STRENGTH_DECIBELS, visible=False, icon="mdi:wifi"),
+        ), translation="wifi_rssi", key="wifiRssi", unit=SIGNAL_STRENGTH_DECIBELS, visible=False, category=EntityCategory.DIAGNOSTIC, icon="mdi:wifi"),
         NeakasaSensor(coordinator, DeviceInfo(
             identifiers={(DOMAIN, coordinator.deviceid)}
         ), translation="stay_time", key="stayTime", unit=UnitOfTime.SECONDS, visible=False),
@@ -63,7 +63,7 @@ class NeakasaSensor(CoordinatorEntity):
     _attr_should_poll = False
     _attr_has_entity_name = True
     
-    def __init__(self, coordinator: NeakasaCoordinator, deviceinfo: DeviceInfo, translation: str, key: str, unit: str, icon: str = None, visible: bool = True) -> None:
+    def __init__(self, coordinator: NeakasaCoordinator, deviceinfo: DeviceInfo, translation: str, key: str, unit: str, icon: str = None, visible: bool = True, category: str = None) -> None:
         super().__init__(coordinator)
         self.device_info = deviceinfo
         self.data_key = key
@@ -73,6 +73,8 @@ class NeakasaSensor(CoordinatorEntity):
         self._attr_unit_of_measurement = unit
         if icon is not None:
             self._attr_icon = icon
+        if category is not None:
+            self._attr_entity_category = category
 
     @callback
     def _handle_coordinator_update(self) -> None:
