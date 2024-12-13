@@ -335,7 +335,7 @@ class NeakasaAPI:
             },
             request=request
         )
-        await self.hass.async_add_executor_job(client.do_request,
+        response = await self.hass.async_add_executor_job(client.do_request,
             '/thing/properties/set',
             'https',
             'POST',
@@ -343,6 +343,9 @@ class NeakasaAPI:
             body,
             RuntimeOptions()
         )
+        response_data = json.loads(response.body)
+        if response_data['code'] != 200:
+            raise APIConnectionError("Error setting device properties.")
 
     async def _invokeService(self, iotId: str, identifier: str, args: dict[str, any]):
         if self.connected == False:
@@ -363,7 +366,7 @@ class NeakasaAPI:
             },
             request=request
         )
-        await self.hass.async_add_executor_job(client.do_request,
+        response = await self.hass.async_add_executor_job(client.do_request,
             '/thing/service/invoke',
             'https',
             'POST',
@@ -371,6 +374,9 @@ class NeakasaAPI:
             body,
             RuntimeOptions()
         )
+        response_data = json.loads(response.body)
+        if response_data['code'] != 200:
+            raise APIConnectionError("Error invoking service.")
     
     async def cleanNow(self, iotId: str):
         await self._invokeService(iotId, "cleanNow", {"bStartClean":1})
