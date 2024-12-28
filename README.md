@@ -22,7 +22,7 @@ The Neakasa Home Assistant Custom Integration allows you to integrate your Neaka
 |WiFi RSS|dB|-60 dB|no (debug information)|
 |Last stay time|seconds|45 s|no|
 |Last usage|datetime|2024-12-07 14:52|yes|
-|Device status|idle / cleaning/ leveling|idle|yes|
+|Device status|idle / cleaning / leveling / flipover|idle|yes|
 |Cat litter state|insufficient / moderate / sufficient|sufficient|yes|
 |Bin state|normal / full / missing|normal|yes|
 
