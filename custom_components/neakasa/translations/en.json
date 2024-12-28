@@ -55,7 +55,8 @@
                 "state": {
                     "idle": "Idle",
                     "cleaning": "Cleaning",
-                    "leveling": "Leveling"
+                    "leveling": "Leveling",
+                    "flipover": "Upside Down"
                 }
             },
             "sand_state": {
