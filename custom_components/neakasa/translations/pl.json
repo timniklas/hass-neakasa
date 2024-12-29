@@ -60,7 +60,7 @@
                 }
             },
             "sand_state": {
-                "name": "Poziom żwirku",
+                "name": "Stan żwirku",
                 "state": {
                     "insufficient": "Niewystarczający",
                     "moderate": "Umiarkowany",
