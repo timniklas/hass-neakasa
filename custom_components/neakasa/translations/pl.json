@@ -55,7 +55,7 @@
                 "state": {
                     "idle": "Oczekiwanie",
                     "cleaning": "Czyszczenie",
-                    "leveling": "Poziomowanie"
+                    "leveling": "Poziomowanie",
                     "flipover": "Do góry dnem"
                 }
             },
