@@ -1,0 +1,104 @@
+{
+    "title": "Neakasa",
+    "config": {
+        "step": {
+            "user": {
+                "title": "Konto Neakasa",
+                "description": "Dane logowanie zostaną użyte do pobrania danych z serwera.",
+                "data": {
+                    "username": "Nazwa użytkownika",
+                    "password": "Hasło"
+                }
+            },
+            "device": {
+                "description": "Wybierz jedno z dostępnych urządzeń.",
+                "data": {
+                    "device_id": "ID urządzenia"
+                }
+            }
+        },
+        "abort": {
+            "connenction": "Błąd połączenia.",
+            "authentication": "Błąd uwierzytelnienia.",
+            "unknown": "Nieznany błąd."
+        }
+    },
+    "entity": {
+        "button": {
+            "clean": {
+                "name": "Wyczyść"
+            },
+            "level": {
+                "name": "Wypoziomuj"
+            }
+        },
+        "binary_sensor": {
+            "bin_full": {
+                "name": "Pojemnik pełen"
+            }
+        },
+        "sensor": {
+            "sand_percent": {
+                "name": "Poziom żwirku"
+            },
+            "wifi_rssi": {
+                "name": "WiFi RSSI"
+            },
+            "stay_time": {
+                "name": "Długość ostatniego pobytu"
+            },
+            "last_usage": {
+                "name": "Ostatni pobyt"
+            },
+            "current_status": {
+                "name": "Status kuwety",
+                "state": {
+                    "idle": "Oczekiwanie",
+                    "cleaning": "Czyszczenie",
+                    "leveling": "Poziomowanie"
+                    "flipover": "Do góry dnem"
+                }
+            },
+            "sand_state": {
+                "name": "Poziom żwirku",
+                "state": {
+                    "insufficient": "Niewystarczający",
+                    "moderate": "Umiarkowany",
+                    "sufficient": "Wystarczający",
+                    "overfilled": "Przepełniony"
+                }
+            },
+            "bin_state": {
+                "name": "Zbiornik na odpady",
+                "state": {
+                    "normal": "Normalny",
+                    "full": "Pełny",
+                    "missing": "Poza podstawą"
+                }
+            }
+        },
+        "switch": {
+            "young_cat_mode": {
+                "name": "Tryb dla kociąt"
+            },
+            "child_lock": {
+                "name": "Blokada panelu"
+            },
+            "auto_bury": {
+                "name": "Automatyczne czyszczenie"
+            },
+            "auto_level": {
+                "name": "Automatyczne poziomowanie"
+            },
+            "silent_mode": {
+                "name": "Tryb cichy"
+            },
+            "auto_recovery": {
+                "name": "Automatyczny powrót"
+            },
+            "unstoppable_cycle": {
+                "name": "Nieprzerwany cykl"
+            }
+        }
+    }
+}
