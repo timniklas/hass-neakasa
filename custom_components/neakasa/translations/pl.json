@@ -55,12 +55,12 @@
                 "state": {
                     "idle": "Oczekiwanie",
                     "cleaning": "Czyszczenie",
-                    "leveling": "Poziomowanie"
+                    "leveling": "Poziomowanie",
                     "flipover": "Do góry dnem"
                 }
             },
             "sand_state": {
-                "name": "Poziom żwirku",
+                "name": "Stan żwirku",
                 "state": {
                     "insufficient": "Niewystarczający",
                     "moderate": "Umiarkowany",
