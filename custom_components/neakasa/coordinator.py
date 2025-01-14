@@ -112,12 +112,6 @@ class NeakasaCoordinator(DataUpdateCoordinator):
                 lastUse=devicedata['catLeft']['time']
             )
         except APIAuthError as err:
-            _LOGGER.error(err)
             raise UpdateFailed(err) from err
         except APIConnectionError as err:
-            _LOGGER.error(err)
             raise UpdateFailed(err) from err
-        except Exception as err:
-            _LOGGER.error(err)
-            # This will show entities as unavailable by raising UpdateFailed exception
-            raise UpdateFailed(f"Error communicating with API: {err}") from err
