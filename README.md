@@ -86,6 +86,12 @@ rm neakasa.zip
 From the Home Assistant front page go to `Configuration` and then select `Devices & Services` from the list.
 Use the `Add Integration` button in the bottom right to add a new integration called `Neakasa`.
 
+## Troubleshooting steps
+
+1. check if you use the integration with a different account than with the app (simply share the device with the second account)
+2. reset the Litterbox and reintegrated it
+3. open an issue
+
 ## Help and Contribution
 
 If you find a problem, feel free to report it and I will do my best to help you.
