@@ -12,7 +12,7 @@
 The Neakasa Home Assistant Custom Integration allows you to integrate your Neakasa devices with your Home Assistant setup.
 
 ### Currently supported devices
-- Neakasa M1
+- Neakasa M1 (Cat Litter Box)
 
 ### Currently supported features
 #### Sensors:
@@ -65,8 +65,9 @@ This integration is available in HACS (Home Assistant Community Store).
 9. Search for "Neakasa"
 10. Click the "Download" button
 
-### Manual
+### Manual installation
 
+#### from downloaded zip archive
 To install this integration manually you have to download [_neakasa.zip_](https://github.com/timniklas/hass-neakasa/releases/latest/) and extract its contents to `config/custom_components/neakasa` directory:
 
 ```bash
@@ -76,6 +77,34 @@ wget https://github.com/timniklas/hacs_blitzerde/releases/latest/download/neakas
 unzip neakasa.zip
 rm neakasa.zip
 ```
+restart Home Assistant.
+
+#### Installation from git repository
+
+with this variant, you can easily update the integration from the github repository.
+
+##### First installation:
+
+```bash
+cd <to your Home Assistant config directory>
+git clone https://github.com/timniklas/hass-neakasa
+mkdir custom_components
+cd custom_components
+ln -s ../hass-neakasa/custom_components/neakasa/ .
+```
+
+restart Home Assistant.
+
+##### update the existing installation:
+
+```bash
+cd <to your Home Assistant config directory>
+cd hass-neakasa/
+git pull
+```
+
+restart Home Assistant.
+
 
 ## Configuration
 
@@ -86,11 +115,12 @@ rm neakasa.zip
 From the Home Assistant front page go to `Configuration` and then select `Devices & Services` from the list.
 Use the `Add Integration` button in the bottom right to add a new integration called `Neakasa`.
 
-## Troubleshooting steps
+## Troubleshooting Tips / Known Issues
 
-1. check if you use the integration with a different account than with the app (simply share the device with the second account)
-2. reset the Litterbox and reintegrated it
-3. open an issue
+1. When you discover  that the mobile app is starting over and over, beginning again with the login steps, then you should use this HA integration with a different account than with the app. Create a second account and use the share function in the app - simply share the device with the second account
+2. powercycle the litterbox
+3. reset the litterbox and reintegrate it
+4. open an issue
 
 ## Help and Contribution
 
