@@ -33,17 +33,16 @@ async def async_setup_entry(
     coordinator: NeakasaCoordinator = hass.data[DOMAIN][
         config_entry.entry_id
     ].coordinator
-
+    device_info = DeviceInfo(
+        name=coordinator.devicename,
+        manufacturer="Neakasa",
+        identifiers={(DOMAIN, coordinator.deviceid)}
+    )
     # Enumerate all the sensors in your data value from your DataUpdateCoordinator and add an instance of your sensor class
     # to a list for each one.
     # This maybe different in your specific case, depending on how your data is structured
     sensors = [
-        NeakasaBinarySensor(coordinator, DeviceInfo(
-            #only generate device once!
-            name=coordinator.devicename,
-            manufacturer="Neakasa",
-            identifiers={(DOMAIN, coordinator.deviceid)}
-        ), translation="bin_full", key="binFullWaitReset", icon="mdi:delete-empty")
+        NeakasaBinarySensor(coordinator, device_info, translation="bin_full", key="binFullWaitReset", icon="mdi:delete-empty")
     ]
 
     # Create the sensors.
