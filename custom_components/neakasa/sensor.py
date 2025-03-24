@@ -27,32 +27,22 @@ async def async_setup_entry(
     coordinator: NeakasaCoordinator = hass.data[DOMAIN][
         config_entry.entry_id
     ].coordinator
-
+    device_info = DeviceInfo(
+        name=coordinator.devicename,
+        manufacturer="Neakasa",
+        identifiers={(DOMAIN, coordinator.deviceid)}
+    )
     # Enumerate all the sensors in your data value from your DataUpdateCoordinator and add an instance of your sensor class
     # to a list for each one.
     # This maybe different in your specific case, depending on how your data is structured
     sensors = [
-        NeakasaSensor(coordinator, DeviceInfo(
-            identifiers={(DOMAIN, coordinator.deviceid)}
-        ), translation="sand_percent", key="sandLevelPercent", unit=PERCENTAGE),
-        NeakasaSensor(coordinator, DeviceInfo(
-            identifiers={(DOMAIN, coordinator.deviceid)}
-        ), translation="wifi_rssi", key="wifiRssi", unit=SIGNAL_STRENGTH_DECIBELS, visible=False, category=EntityCategory.DIAGNOSTIC, icon="mdi:wifi"),
-        NeakasaSensor(coordinator, DeviceInfo(
-            identifiers={(DOMAIN, coordinator.deviceid)}
-        ), translation="stay_time", key="stayTime", unit=UnitOfTime.SECONDS, visible=False),
-        NeakasaTimestampSensor(coordinator, DeviceInfo(
-            identifiers={(DOMAIN, coordinator.deviceid)}
-        ), translation="last_usage", key="lastUse"),
-        NeakasaMapSensor(coordinator, DeviceInfo(
-            identifiers={(DOMAIN, coordinator.deviceid)}
-        ), translation="current_status", key="bucketStatus", options=['idle', 'cleaning', 'cleaning', 'leveling', 'flipover'], icon="mdi:state-machine"),
-        NeakasaMapSensor(coordinator, DeviceInfo(
-            identifiers={(DOMAIN, coordinator.deviceid)}
-        ), translation="sand_state", key="sandLevelState", options=['insufficient', 'moderate', 'sufficient', 'overfilled']),
-        NeakasaMapSensor(coordinator, DeviceInfo(
-            identifiers={(DOMAIN, coordinator.deviceid)}
-        ), translation="bin_state", key="room_of_bin", options=['normal', 'full', 'missing'], icon="mdi:delete")
+        NeakasaSensor(coordinator, device_info, translation="sand_percent", key="sandLevelPercent", unit=PERCENTAGE),
+        NeakasaSensor(coordinator, device_info, translation="wifi_rssi", key="wifiRssi", unit=SIGNAL_STRENGTH_DECIBELS, visible=False, category=EntityCategory.DIAGNOSTIC, icon="mdi:wifi"),
+        NeakasaSensor(coordinator, device_info, translation="stay_time", key="stayTime", unit=UnitOfTime.SECONDS, visible=False),
+        NeakasaTimestampSensor(coordinator, device_info, translation="last_usage", key="lastUse"),
+        NeakasaMapSensor(coordinator, device_info, translation="current_status", key="bucketStatus", options=['idle', 'cleaning', 'cleaning', 'leveling', 'flipover'], icon="mdi:state-machine"),
+        NeakasaMapSensor(coordinator, device_info, translation="sand_state", key="sandLevelState", options=['insufficient', 'moderate', 'sufficient', 'overfilled']),
+        NeakasaMapSensor(coordinator, device_info, translation="bin_state", key="room_of_bin", options=['normal', 'full', 'missing'], icon="mdi:delete")
     ]
 
     # Create the sensors.
