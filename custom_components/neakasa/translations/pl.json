@@ -56,7 +56,8 @@
                     "idle": "Oczekiwanie",
                     "cleaning": "Czyszczenie",
                     "leveling": "Poziomowanie",
-                    "flipover": "Do góry dnem"
+                    "flipover": "Do góry dnem",
+                    "cat_present": "Kot obecny"
                 }
             },
             "sand_state": {

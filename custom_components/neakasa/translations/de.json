@@ -56,7 +56,8 @@
                     "idle": "Leerlauf",
                     "cleaning": "Reinigung",
                     "leveling": "Nivellierung",
-                    "flipover": "Verkehrt Herum"
+                    "flipover": "Verkehrt Herum",
+                    "cat_present": "Katze anwesend"
                 }
             },
             "sand_state": {
