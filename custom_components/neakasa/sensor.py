@@ -82,11 +82,15 @@ class NeakasaCatSensor(CoordinatorEntity):
 
     @property
     def state(self):
+        if len(self._records) == 0:
+            return 0
         last_record = self._records[-1]
         return last_record['weight']
     
     @property
     def extra_state_attributes(self):
+        if len(self._records) == 0:
+            return {}
         last_record = self._records[-1]
         return {
             "state_class": SensorStateClass.MEASUREMENT,
