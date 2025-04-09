@@ -25,6 +25,7 @@ The Neakasa Home Assistant Custom Integration allows you to integrate your Neaka
 |Device status|idle / cleaning / leveling / flipover / cat_present|idle|yes|
 |Cat litter state|insufficient / moderate / sufficient|sufficient|yes|
 |Bin state|normal / full / missing|normal|yes|
+|Cat {name}|kg|3.8|yes|
 
 #### Binary sensors:
 |Binary Sensor|Example Value|Enabled by default|
