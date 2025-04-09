@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import timedelta
 import logging
 
@@ -39,6 +39,9 @@ class NeakasaAPIData:
     bIntrptRangeDet: bool
     stayTime: int
     lastUse: int
+    cat_list: list[object] = field(default_factory=list)
+    record_list: list[object] = field(default_factory=list)
+    statistics: list[object] = field(default_factory=list)
 
 
 class NeakasaCoordinator(DataUpdateCoordinator):
@@ -87,6 +90,15 @@ class NeakasaCoordinator(DataUpdateCoordinator):
                 return await self.api.sandLeveling(self.deviceid)
         raise Exception('cannot find service to invoke')
 
+    async def _getDeviceName(self):
+        """get deviceName by iotId"""
+        await self.api.connect(self.username, self.password)
+        devices = await self.api.getDevices()
+        devices = list(filter(lambda devices: devices['iotId'] == self.deviceid, devices))
+        if(len(devices) == 0):
+            raise APIConnectionError("iotId not found in device list")
+        return devices[0]['deviceName']
+
     async def async_update_data(self):
         """Fetch data from API endpoint.
 
@@ -95,6 +107,9 @@ class NeakasaCoordinator(DataUpdateCoordinator):
         """
         try:
             await self.api.connect(self.username, self.password)
+            deviceName = await self._getDeviceName()
+            statistics = await self.api.getStatistics(deviceName)
+            records = await self.api.getRecords(deviceName)
             devicedata = await self.api.getDeviceProperties(self.deviceid)
             try:
                 return NeakasaAPIData(
@@ -112,7 +127,10 @@ class NeakasaCoordinator(DataUpdateCoordinator):
                     room_of_bin=devicedata['room_of_bin']['value'], #-> Abfalleimer [2=nicht in Position,0=Normal]
                     sandLevelState=devicedata['Sand']['value']['level'], #-> Katzenstreu [0=Unzureichend,1=Mäßig,2=Ausreichend]
                     stayTime=devicedata['catLeft']['value']['stayTime'],
-                    lastUse=devicedata['catLeft']['time']
+                    lastUse=devicedata['catLeft']['time'],
+                    cat_list=records['cat_list'],
+                    record_list=records['record_list'],
+                    statistics=statistics
                 )
             except Exception as err:
                 _LOGGER.error(err)

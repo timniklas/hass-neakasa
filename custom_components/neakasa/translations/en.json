@@ -38,6 +38,9 @@
             }
         },
         "sensor": {
+            "cat_sensor": {
+                "name": "Cat {name}"
+            },
             "sand_percent": {
                 "name": "Cat litter level"
             },
