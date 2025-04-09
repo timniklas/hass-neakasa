@@ -7,7 +7,6 @@ import time
 import hmac
 import hashlib
 import base64
-from aiohttp import ClientSession
 from .api_encryption import APIEncryption
 
 #############################
@@ -20,7 +19,7 @@ async def async_add_executor_job(target, *args):
 
 
 class NeakasaAPI:
-    def __init__(self, session = ClientSession(), async_executor = async_add_executor_job, app_key: str = "32715650", app_secret: str = "698ee0ef531c3df2ddded87563643860", language = "en-US") -> None:
+    def __init__(self, session, async_executor = async_add_executor_job, app_key: str = "32715650", app_secret: str = "698ee0ef531c3df2ddded87563643860", language = "en-US") -> None:
         self._app_key = app_key
         self._app_secret = app_secret
         self._language = language
