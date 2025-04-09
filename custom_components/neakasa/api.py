@@ -127,7 +127,7 @@ class NeakasaAPI:
         config = Config(
             app_key=self._app_key,
             app_secret=self._app_secret,
-            domain="sdk.openaccount.aliyun.com"
+            domain=self.oaApiGatewayEndpoint
         )
         client = Client(config)
         body = {
