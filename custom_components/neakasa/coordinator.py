@@ -110,8 +110,6 @@ class NeakasaCoordinator(DataUpdateCoordinator):
             deviceName = await self._getDeviceName()
             statistics = await self.api.getStatistics(deviceName)
             records = await self.api.getRecords(deviceName)
-            _LOGGER.warn(statistics)
-            _LOGGER.warn(records)
             devicedata = await self.api.getDeviceProperties(self.deviceid)
             try:
                 return NeakasaAPIData(
