@@ -1,5 +1,5 @@
 import json
-from datetime import timedelta
+from datetime import timedelta, datetime
 from alibabacloud_iot_api_gateway.models import Config, IoTApiRequest, CommonParams
 from aiohttp import ClientError
 from .client import Client
@@ -392,8 +392,8 @@ class NeakasaAPI:
     
     async def getStatistics(self, deviceName: str):
         try:
-            timestamp = str(int(time.time()))
-            signature_raw = hmac.new(self._app_secret.encode(), (self._app_key + timestamp).encode(), digestmod=hashlib.sha256)
+            timestamp = int(time.time())
+            signature_raw = hmac.new(self._app_secret.encode(), (self._app_key + str(timestamp)).encode(), digestmod=hashlib.sha256)
             signature = base64.b64encode(signature_raw.digest()).decode("utf-8")
             async with self._session.get(
                 url=self.baseurl + '/catbox/toilet/statistics',
@@ -401,8 +401,8 @@ class NeakasaAPI:
                     "user_id": self._encryption.userid,
                     "device_name": deviceName,
                     "bind_status": 2,
-                    "start_time": int(time.time()) - timedelta(days=7),
-                    "end_time": int(time.time())
+                    "start_time": int((datetime.fromtimestamp(timestamp) - timedelta(days=7)).timestamp()), #7 days ago
+                    "end_time": timestamp
                 },
                 headers={
                 "Request-Id": signature,
@@ -419,8 +419,8 @@ class NeakasaAPI:
     
     async def getRecords(self, deviceName: str):
         try:
-            timestamp = str(int(time.time()))
-            signature_raw = hmac.new(self._app_secret.encode(), (self._app_key + timestamp).encode(), digestmod=hashlib.sha256)
+            timestamp = int(time.time())
+            signature_raw = hmac.new(self._app_secret.encode(), (self._app_key + str(timestamp)).encode(), digestmod=hashlib.sha256)
             signature = base64.b64encode(signature_raw.digest()).decode("utf-8")
             async with self._session.get(
                 url=self.baseurl + '/catbox/record',
@@ -428,8 +428,8 @@ class NeakasaAPI:
                     "user_id": self._encryption.userid,
                     "device_name": deviceName,
                     "bind_status": 2,
-                    "start_time": int(time.time()) - timedelta(days=7),
-                    "end_time": int(time.time())
+                    "start_time": int((datetime.fromtimestamp(timestamp) - timedelta(days=7)).timestamp()), #7 days ago
+                    "end_time": timestamp
                 },
                 headers={
                 "Request-Id": signature,
