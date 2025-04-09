@@ -1,4 +1,5 @@
 import json
+from datetime import timedelta
 from alibabacloud_iot_api_gateway.models import Config, IoTApiRequest, CommonParams
 from aiohttp import ClientError
 from .client import Client
@@ -389,7 +390,7 @@ class NeakasaAPI:
     async def sandLeveling(self, iotId: str):
         await self._invokeService(iotId, "sandLeveling", {"bStartLeveling":1})
     
-    async def getStatistics(self, deviceName: str, days: int = 7):
+    async def getStatistics(self, deviceName: str):
         try:
             timestamp = str(int(time.time()))
             signature_raw = hmac.new(self._app_secret.encode(), (self._app_key + timestamp).encode(), digestmod=hashlib.sha256)
@@ -400,7 +401,7 @@ class NeakasaAPI:
                     "user_id": self._encryption.userid,
                     "device_name": deviceName,
                     "bind_status": 2,
-                    "start_time": int(time.time()) - (60*60*24*days),
+                    "start_time": int(time.time()) - timedelta(days=7),
                     "end_time": int(time.time())
                 },
                 headers={
@@ -416,7 +417,7 @@ class NeakasaAPI:
         except ClientError as exc:
             raise APIConnectionError("Error connecting to api.")
     
-    async def getRecords(self, deviceName: str, days: int = 7):
+    async def getRecords(self, deviceName: str):
         try:
             timestamp = str(int(time.time()))
             signature_raw = hmac.new(self._app_secret.encode(), (self._app_key + timestamp).encode(), digestmod=hashlib.sha256)
@@ -427,7 +428,7 @@ class NeakasaAPI:
                     "user_id": self._encryption.userid,
                     "device_name": deviceName,
                     "bind_status": 2,
-                    "start_time": int(time.time()) - (60*60*24*days),
+                    "start_time": int(time.time()) - timedelta(days=7),
                     "end_time": int(time.time())
                 },
                 headers={
