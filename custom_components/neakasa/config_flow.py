@@ -1,6 +1,7 @@
 import voluptuous as vol
 from homeassistant.config_entries import ConfigFlow
 from aiohttp import ClientError, ClientResponseError, ClientSession, BasicAuth
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from homeassistant.const import (
     CONF_DEVICE_ID,
@@ -25,7 +26,8 @@ class NeakasaConfigFlow(ConfigFlow, domain=DOMAIN):
             self._username = formdata[CONF_USERNAME]
             self._password = formdata[CONF_PASSWORD]
             try:
-                api = NeakasaAPI(self.hass)
+                session = async_get_clientsession(self.hass)
+                api = NeakasaAPI(session, self.hass.async_add_executor_job)
                 await api.connect(self._username, self._password)
 
                 devices = await api.getDevices()
