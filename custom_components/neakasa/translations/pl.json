@@ -38,6 +38,9 @@
             }
         },
         "sensor": {
+            "cat_sensor": {
+                "name": "kot {name}"
+            },
             "sand_percent": {
                 "name": "Poziom żwirku"
             },
