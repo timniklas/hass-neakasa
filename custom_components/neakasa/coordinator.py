@@ -10,6 +10,7 @@ from homeassistant.const import (
     CONF_PASSWORD,
 )
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from datetime import datetime
 
@@ -66,7 +67,8 @@ class NeakasaCoordinator(DataUpdateCoordinator):
         )
 
         # Initialise api here
-        self.api = NeakasaAPI(self.hass)
+        session = async_get_clientsession(hass)
+        self.api = NeakasaAPI(session, hass.async_add_executor_job)
         
 
     async def setProperty(self, key: str, value: int):
