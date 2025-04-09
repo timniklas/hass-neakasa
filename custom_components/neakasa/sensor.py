@@ -9,7 +9,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
-from homeassistant.const import PERCENTAGE, SIGNAL_STRENGTH_DECIBELS, UnitOfTime, EntityCategory
+from homeassistant.const import PERCENTAGE, SIGNAL_STRENGTH_DECIBELS, UnitOfTime, EntityCategory, UnitOfMass
 from datetime import datetime
 
 from .const import DOMAIN
@@ -45,8 +45,54 @@ async def async_setup_entry(
         NeakasaMapSensor(coordinator, device_info, translation="bin_state", key="room_of_bin", options=['normal', 'full', 'missing'], icon="mdi:delete")
     ]
 
+    for cat in coordinator.data.cat_list:
+        sensors.append(
+            NeakasaCatSensor(coordinator, device_info, catName=cat['name'], catId=cat['id'], icon="mdi:cat")
+        )
+
     # Create the sensors.
     async_add_entities(sensors)
+
+class NeakasaCatSensor(CoordinatorEntity):
+    
+    _attr_should_poll = False
+    _attr_has_entity_name = True
+    
+    def __init__(self, coordinator: NeakasaCoordinator, deviceinfo: DeviceInfo, catName: str, catId: str, icon: str = None, visible: bool = True, category: str = None) -> None:
+        super().__init__(coordinator)
+        self.device_info = deviceinfo
+        self.entity_registry_enabled_default = visible
+        self._attr_translation_key = "cat_sensor"
+        self._attr_translation_placeholders = {"name": catName}
+        self._attr_unique_id = f"{coordinator.deviceid}-cat-{catId}"
+        self._attr_unit_of_measurement = UnitOfMass.KILOGRAMS
+        self._catId = catId
+        if icon is not None:
+            self._attr_icon = icon
+        if category is not None:
+            self._attr_entity_category = category
+
+    @callback
+    def _handle_coordinator_update(self) -> None:
+        self.async_write_ha_state()
+    
+    @property
+    def _records(self):
+        return list(filter(lambda record: record['cat_id'] == self._catId, self.coordinator.data.record_list))
+
+    @property
+    def state(self):
+        last_record = self._records[-1]
+        return last_record['weight']
+    
+    @property
+    def extra_state_attributes(self):
+        last_record = self._records[-1]
+        return {
+            "state_class": SensorStateClass.MEASUREMENT,
+            "start_time": datetime.fromtimestamp(last_record['start_time']),
+            "end_time": datetime.fromtimestamp(last_record['end_time'])
+        }
 
 class NeakasaSensor(CoordinatorEntity):
     
