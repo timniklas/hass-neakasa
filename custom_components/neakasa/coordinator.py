@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from datetime import timedelta
 import logging
+from typing import Optional, Any
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
@@ -43,6 +44,61 @@ class NeakasaAPIData:
     record_list: list[object] = field(default_factory=list)
     statistics: list[object] = field(default_factory=list)
 
+class ValueCacher:
+    def __init__(self, refresh_after: Optional[timedelta], discard_after: Optional[timedelta]):
+        """
+        :param refresh_after:
+            How long to wait before considering the cached value stale and needing refresh.
+            - None: value never considered stale
+            - timedelta <= 0: always considered stale
+            - > 0: value is stale after this duration
+
+        :param discard_after:
+            How long to keep the cached value before discarding it entirely.
+            - None: value never discarded (always acceptable as fallback)
+            - timedelta <= 0: value is immediately discarded
+            - > 0: value is discarded after this duration
+        """
+        self._refresh_after = refresh_after
+        self._discard_after = discard_after
+        self._value: Optional[Any] = None
+        self._last_update: Optional[datetime] = None
+
+    def set(self, value: Any) -> None:
+        self._value = value
+        self._last_update = datetime.utcnow()
+
+    def clear(self) -> None:
+        self._value = None
+        self._last_update = None
+
+    def value_if_not_stale(self) -> Optional[Any]:
+        """
+        Return the value only if it is still fresh (not past refresh_after).
+        Useful when you want to use cached data only if it's up-to-date.
+        """
+        if self._value is None or self._last_update is None:
+            return None
+        if self._refresh_after is not None:
+            if self._refresh_after <= timedelta(0):
+                return None
+            if datetime.utcnow() - self._last_update > self._refresh_after:
+                return None
+        return self._value
+
+    def value_if_not_discarded(self) -> Optional[Any]:
+        """
+        Return the value only if it hasn't been discarded.
+        Discarding is based on discard_after.
+        """
+        if self._value is None or self._last_update is None:
+            return None
+        if self._discard_after is not None:
+            if self._discard_after <= timedelta(0):
+                return None
+            if datetime.utcnow() - self._last_update > self._discard_after:
+                return None
+        return self._value
 
 class NeakasaCoordinator(DataUpdateCoordinator):
     """My coordinator."""
@@ -59,6 +115,10 @@ class NeakasaCoordinator(DataUpdateCoordinator):
         self.password = config_entry.data[CONF_PASSWORD]
 
         self._deviceName = None
+
+        self._statisticsCache = ValueCacher(refresh_after=timedelta(hours=5), discard_after=timedelta(hours=7))
+        self._recordsCache = ValueCacher(refresh_after=timedelta(minutes=30), discard_after=timedelta(hours=3))
+        self._devicePropertiesCache = ValueCacher(refresh_after=timedelta(seconds=0), discard_after=timedelta(minutes=30))
 
         # Initialise DataUpdateCoordinator
         super().__init__(
@@ -106,6 +166,47 @@ class NeakasaCoordinator(DataUpdateCoordinator):
         self._deviceName = deviceName
         return deviceName
 
+    async def _getStatistics(self):
+        if (value := self._statisticsCache.value_if_not_stale()) is not None:
+            return value
+        try:
+            await self.api.connect(self.username, self.password)
+            deviceName = await self._getDeviceName()
+            statistics = await self.api.getStatistics(deviceName)
+            self._statisticsCache.set(value=statistics)
+            return statistics
+        except Exception as err:
+            if (value := self._statisticsCache.value_if_not_discarded()) is not None:
+                return value
+            raise err
+
+    async def _getRecords(self):
+        if (value := self._recordsCache.value_if_not_stale()) is not None:
+            return value
+        try:
+            await self.api.connect(self.username, self.password)
+            deviceName = await self._getDeviceName()
+            records = await self.api.getRecords(deviceName)
+            self._recordsCache.set(value=records)
+            return records
+        except Exception as err:
+            if (value := self._recordsCache.value_if_not_discarded()) is not None:
+                return value
+            raise err
+
+    async def _getDeviceProperties(self):
+        if (value := self._devicePropertiesCache.value_if_not_stale()) is not None:
+            return value
+        try:
+            await self.api.connect(self.username, self.password)
+            devicedata = await self.api.getDeviceProperties(self.deviceid)
+            self._devicePropertiesCache.set(value=devicedata)
+            return devicedata
+        except Exception as err:
+            if (value := self._devicePropertiesCache.value_if_not_discarded()) is not None:
+                return value
+            raise err
+
     async def async_update_data(self):
         """Fetch data from API endpoint.
 
@@ -113,11 +214,9 @@ class NeakasaCoordinator(DataUpdateCoordinator):
         so entities can quickly look up their data.
         """
         try:
-            await self.api.connect(self.username, self.password)
-            deviceName = await self._getDeviceName()
-            statistics = await self.api.getStatistics(deviceName)
-            records = await self.api.getRecords(deviceName)
-            devicedata = await self.api.getDeviceProperties(self.deviceid)
+            statistics = await self._getStatistics()
+            records = await self._getRecords()
+            devicedata = await self._getDeviceProperties()
             try:
                 return NeakasaAPIData(
                     binFullWaitReset=devicedata['binFullWaitReset']['value'] == 1, #-> Abfalleimer voll
@@ -135,8 +234,10 @@ class NeakasaCoordinator(DataUpdateCoordinator):
                     sandLevelState=devicedata['Sand']['value']['level'], #-> Katzenstreu [0=Unzureichend,1=Mäßig,2=Ausreichend]
                     stayTime=devicedata['catLeft']['value']['stayTime'],
                     lastUse=devicedata['catLeft']['time'],
+
                     cat_list=records['cat_list'],
                     record_list=records['record_list'],
+
                     statistics=statistics
                 )
             except Exception as err:
