@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from datetime import timedelta
 import logging
-from typing import Optional, Any
+from typing import Optional, Any, Awaitable, Callable
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
@@ -100,6 +100,22 @@ class ValueCacher:
                 return None
         return self._value
 
+    async def get_or_update(self, update_func: Callable[[], Awaitable[Any]]) -> Any:
+        """
+        Return cached value if not stale. Otherwise, call `update_func` to get new value.
+        If update fails, returns cached value if not discarded. Otherwise raises the error.
+        """
+        if (value := self.value_if_not_stale()) is not None:
+            return value
+        try:
+            new_value = await update_func()
+            self.set(new_value)
+            return new_value
+        except Exception as err:
+            if (fallback := self.value_if_not_discarded()) is not None:
+                return fallback
+            raise err
+
 class NeakasaCoordinator(DataUpdateCoordinator):
     """My coordinator."""
 
@@ -116,8 +132,8 @@ class NeakasaCoordinator(DataUpdateCoordinator):
 
         self._deviceName = None
 
-        self._statisticsCache = ValueCacher(refresh_after=timedelta(hours=5), discard_after=timedelta(hours=7))
-        self._recordsCache = ValueCacher(refresh_after=timedelta(minutes=30), discard_after=timedelta(hours=3))
+        self._statisticsCache = ValueCacher(refresh_after=timedelta(minutes=60), discard_after=timedelta(hours=7))
+        self._recordsCache = ValueCacher(refresh_after=timedelta(minutes=30), discard_after=timedelta(hours=4))
         self._devicePropertiesCache = ValueCacher(refresh_after=timedelta(seconds=0), discard_after=timedelta(minutes=30))
 
         # Initialise DataUpdateCoordinator
@@ -167,45 +183,27 @@ class NeakasaCoordinator(DataUpdateCoordinator):
         return deviceName
 
     async def _getStatistics(self):
-        if (value := self._statisticsCache.value_if_not_stale()) is not None:
-            return value
-        try:
+        async def fetch():
             await self.api.connect(self.username, self.password)
             deviceName = await self._getDeviceName()
-            statistics = await self.api.getStatistics(deviceName)
-            self._statisticsCache.set(value=statistics)
-            return statistics
-        except Exception as err:
-            if (value := self._statisticsCache.value_if_not_discarded()) is not None:
-                return value
-            raise err
+            return await self.api.getStatistics(deviceName)
+
+        return await self._statisticsCache.get_or_update(fetch)
 
     async def _getRecords(self):
-        if (value := self._recordsCache.value_if_not_stale()) is not None:
-            return value
-        try:
+        async def fetch():
             await self.api.connect(self.username, self.password)
             deviceName = await self._getDeviceName()
-            records = await self.api.getRecords(deviceName)
-            self._recordsCache.set(value=records)
-            return records
-        except Exception as err:
-            if (value := self._recordsCache.value_if_not_discarded()) is not None:
-                return value
-            raise err
+            return await self.api.getRecords(deviceName)
+
+        return await self._recordsCache.get_or_update(fetch)
 
     async def _getDeviceProperties(self):
-        if (value := self._devicePropertiesCache.value_if_not_stale()) is not None:
-            return value
-        try:
+        async def fetch():
             await self.api.connect(self.username, self.password)
-            devicedata = await self.api.getDeviceProperties(self.deviceid)
-            self._devicePropertiesCache.set(value=devicedata)
-            return devicedata
-        except Exception as err:
-            if (value := self._devicePropertiesCache.value_if_not_discarded()) is not None:
-                return value
-            raise err
+            return await self.api.getDeviceProperties(self.deviceid)
+
+        return await self._devicePropertiesCache.get_or_update(fetch)
 
     async def async_update_data(self):
         """Fetch data from API endpoint.
