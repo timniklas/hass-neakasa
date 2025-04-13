@@ -58,6 +58,8 @@ class NeakasaCoordinator(DataUpdateCoordinator):
         self.username = config_entry.data[CONF_USERNAME]
         self.password = config_entry.data[CONF_PASSWORD]
 
+        self._deviceName = None
+
         # Initialise DataUpdateCoordinator
         super().__init__(
             hass,
@@ -91,13 +93,18 @@ class NeakasaCoordinator(DataUpdateCoordinator):
         raise Exception('cannot find service to invoke')
 
     async def _getDeviceName(self):
+        if self._deviceName is not None:
+            return self._deviceName
+
         """get deviceName by iotId"""
         await self.api.connect(self.username, self.password)
         devices = await self.api.getDevices()
         devices = list(filter(lambda devices: devices['iotId'] == self.deviceid, devices))
         if(len(devices) == 0):
             raise APIConnectionError("iotId not found in device list")
-        return devices[0]['deviceName']
+        deviceName = devices[0]['deviceName']
+        self._deviceName = deviceName
+        return deviceName
 
     async def async_update_data(self):
         """Fetch data from API endpoint.
