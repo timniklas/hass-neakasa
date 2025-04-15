@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from datetime import timedelta
 import logging
+from typing import Optional, Any, Awaitable, Callable
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
@@ -15,10 +16,10 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 from datetime import datetime
 
 from .api import NeakasaAPI, APIAuthError, APIConnectionError
+from .value_cacher import ValueCacher
 from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
-
 
 @dataclass
 class NeakasaAPIData:
@@ -41,8 +42,6 @@ class NeakasaAPIData:
     lastUse: int
     cat_list: list[object] = field(default_factory=list)
     record_list: list[object] = field(default_factory=list)
-    statistics: list[object] = field(default_factory=list)
-
 
 class NeakasaCoordinator(DataUpdateCoordinator):
     """My coordinator."""
@@ -57,6 +56,12 @@ class NeakasaCoordinator(DataUpdateCoordinator):
         self.devicename = config_entry.data[CONF_FRIENDLY_NAME]
         self.username = config_entry.data[CONF_USERNAME]
         self.password = config_entry.data[CONF_PASSWORD]
+
+        self._deviceName = None
+        self.lastUseDate = None
+
+        self._recordsCache = ValueCacher(refresh_after=timedelta(minutes=30), discard_after=timedelta(hours=4))
+        self._devicePropertiesCache = ValueCacher(refresh_after=timedelta(seconds=0), discard_after=timedelta(minutes=30))
 
         # Initialise DataUpdateCoordinator
         super().__init__(
@@ -91,13 +96,33 @@ class NeakasaCoordinator(DataUpdateCoordinator):
         raise Exception('cannot find service to invoke')
 
     async def _getDeviceName(self):
+        if self._deviceName is not None:
+            return self._deviceName
+
         """get deviceName by iotId"""
         await self.api.connect(self.username, self.password)
         devices = await self.api.getDevices()
         devices = list(filter(lambda devices: devices['iotId'] == self.deviceid, devices))
         if(len(devices) == 0):
             raise APIConnectionError("iotId not found in device list")
-        return devices[0]['deviceName']
+        deviceName = devices[0]['deviceName']
+        self._deviceName = deviceName
+        return deviceName
+
+    async def _getRecords(self):
+        async def fetch():
+            await self.api.connect(self.username, self.password)
+            deviceName = await self._getDeviceName()
+            return await self.api.getRecords(deviceName)
+
+        return await self._recordsCache.get_or_update(fetch)
+
+    async def _getDeviceProperties(self):
+        async def fetch():
+            await self.api.connect(self.username, self.password)
+            return await self.api.getDeviceProperties(self.deviceid)
+
+        return await self._devicePropertiesCache.get_or_update(fetch)
 
     async def async_update_data(self):
         """Fetch data from API endpoint.
@@ -106,11 +131,17 @@ class NeakasaCoordinator(DataUpdateCoordinator):
         so entities can quickly look up their data.
         """
         try:
-            await self.api.connect(self.username, self.password)
-            deviceName = await self._getDeviceName()
-            statistics = await self.api.getStatistics(deviceName)
-            records = await self.api.getRecords(deviceName)
-            devicedata = await self.api.getDeviceProperties(self.deviceid)
+            devicedata = await self._getDeviceProperties()
+
+            newLastUseDate = devicedata['catLeft']['time']
+
+            if self.lastUseDate != newLastUseDate:
+                self._recordsCache.mark_as_stale()
+
+            self.lastUseDate = newLastUseDate
+            
+            records = await self._getRecords()
+
             try:
                 return NeakasaAPIData(
                     binFullWaitReset=devicedata['binFullWaitReset']['value'] == 1, #-> Abfalleimer voll
@@ -127,10 +158,10 @@ class NeakasaCoordinator(DataUpdateCoordinator):
                     room_of_bin=devicedata['room_of_bin']['value'], #-> Abfalleimer [2=nicht in Position,0=Normal]
                     sandLevelState=devicedata['Sand']['value']['level'], #-> Katzenstreu [0=Unzureichend,1=Mäßig,2=Ausreichend]
                     stayTime=devicedata['catLeft']['value']['stayTime'],
-                    lastUse=devicedata['catLeft']['time'],
+                    lastUse=newLastUseDate,
+
                     cat_list=records['cat_list'],
-                    record_list=records['record_list'],
-                    statistics=statistics
+                    record_list=records['record_list']
                 )
             except Exception as err:
                 _LOGGER.error(err)
