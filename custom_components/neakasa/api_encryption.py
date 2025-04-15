@@ -3,15 +3,15 @@ from base64 import b64encode, b64decode
 import time
 
 class APIEncryption:
-    _AES_KEY_MAIN = b"3J74PRUE5TKPJP32"
-    _AES_IV_MAIN = b"QB8GC2X6WK39FF93"
+    AES_KEY_DEFAULT = b"3J74PRUE5TKPJP32"
+    AES_IV_DEFAULT = b"QB8GC2X6WK39FF93"
 
     def __init__(self):
         self.resetEncryption()
 
     def resetEncryption(self):
-        self.AES_KEY = self._AES_KEY_MAIN
-        self.AES_IV = self._AES_IV_MAIN
+        self.AES_KEY = self.AES_KEY_DEFAULT
+        self.AES_IV = self.AES_IV_DEFAULT
 
     async def _pad(self, data):
         """NoPadding-compatible: manually fill up to block size 16 with zero bytes"""
