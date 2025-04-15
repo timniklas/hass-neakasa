@@ -40,10 +40,10 @@ class ValueCacher:
     def clear(self) -> None:
         self._value = None
         self._last_update = None
-		self._manually_marked_stale = False
+        self._manually_marked_stale = False
 
     def mark_as_stale(self) -> None:
-		self._manually_marked_stale = true
+        self._manually_marked_stale = true
 
     def value_if_not_stale(self) -> Optional[Any]:
         """
@@ -51,7 +51,7 @@ class ValueCacher:
         Useful when you want to use cached data only if it's up-to-date.
         """
         if self._manually_marked_stale:
-        	return None
+            return None
         if self._value is None or self._last_update is None:
             return None
         if self._refresh_after is not None:
