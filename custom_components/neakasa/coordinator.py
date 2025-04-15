@@ -157,7 +157,7 @@ class NeakasaCoordinator(DataUpdateCoordinator):
                     bucketStatus=devicedata['bucketStatus']['value'], #-> Aktueller Status [0=Leerlauf,2=Reinigung,3=Nivellierung]
                     room_of_bin=devicedata['room_of_bin']['value'], #-> Abfalleimer [2=nicht in Position,0=Normal]
                     sandLevelState=devicedata['Sand']['value']['level'], #-> Katzenstreu [0=Unzureichend,1=Mäßig,2=Ausreichend]
-                    stayTime=devicedata['catLeft']['value']['stayTime'],
+                    stayTime=getattr(devicedata['catLeft']['value'], 'stayTime', 0),
                     lastUse=newLastUseDate,
 
                     cat_list=records['cat_list'],
