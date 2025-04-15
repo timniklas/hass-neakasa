@@ -5,8 +5,6 @@ from typing import Optional, Any, Awaitable, Callable
 
 from datetime import datetime
 
-from .value_cacher import ValueCacher
-
 _LOGGER = logging.getLogger(__name__)
 
 class ValueCacher:
@@ -43,7 +41,7 @@ class ValueCacher:
         self._manually_marked_stale = False
 
     def mark_as_stale(self) -> None:
-        self._manually_marked_stale = true
+        self._manually_marked_stale = True
 
     def value_if_not_stale(self) -> Optional[Any]:
         """
