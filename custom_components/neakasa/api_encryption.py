@@ -9,8 +9,8 @@ class APIEncryption:
         self.resetEncryption()
 
     def resetEncryption(self):
-        self.aes_key = self.AES_KEY_DEFAULT
-        self.aes_iv = self.AES_IV_DEFAULT
+        self.aes_key = AES_KEY_DEFAULT
+        self.aes_iv = AES_IV_DEFAULT
 
     async def _pad(self, data):
         """NoPadding-compatible: manually fill up to block size 16 with zero bytes"""
