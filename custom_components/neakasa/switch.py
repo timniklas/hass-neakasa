@@ -45,6 +45,7 @@ async def async_setup_entry(
     # to a list for each one.
     # This maybe different in your specific case, depending on how your data is structured
     sensors = [
+        NeakasaSwitch(coordinator, device_info, translation="auto_clean", key="cleanCfg", subkey="active", icon="mdi:vacuum"),
         NeakasaSwitch(coordinator, device_info, translation="young_cat_mode", key="youngCatMode", visible=False, icon="mdi:cat"),
         NeakasaSwitch(coordinator, device_info, translation="child_lock", key="childLockOnOff", icon="mdi:lock-alert"),
         NeakasaSwitch(coordinator, device_info, translation="auto_bury", key="autoBury", icon="mdi:window-closed"),
@@ -62,10 +63,11 @@ class NeakasaSwitch(CoordinatorEntity):
     _attr_should_poll = False
     _attr_has_entity_name = True
     
-    def __init__(self, coordinator: NeakasaCoordinator, deviceinfo: DeviceInfo, translation: str, key: str, icon: str = None, visible: bool = True) -> None:
+    def __init__(self, coordinator: NeakasaCoordinator, deviceinfo: DeviceInfo, translation: str, key: str, subkey: str = None, icon: str = None, visible: bool = True) -> None:
         super().__init__(coordinator)
         self.device_info = deviceinfo
         self.data_key = key
+        self.data_subkey = subkey
         self.translation_key = translation
         self.entity_registry_enabled_default = visible
         self._attr_unique_id = f"{coordinator.deviceid}-{translation}"
@@ -77,16 +79,34 @@ class NeakasaSwitch(CoordinatorEntity):
         self.async_write_ha_state()
     
     async def async_turn_on(self, **kwargs):
-        await self.coordinator.setProperty(self.data_key, 1)
+        await self._set_state(1)
 
     async def async_turn_off(self, **kwargs):
-        await self.coordinator.setProperty(self.data_key, 0)
+        await self._set_state(0)
+
+    async def _set_state(self, state: int):
+        """Helper to set device state."""
+        if self.data_subkey is None:
+            await self.coordinator.setProperty(self.data_key, state)
+            return
+
+        value = getattr(self.coordinator.data, self.data_key, None)
+        value[self.data_subkey] = state
+
+        await self.coordinator.setProperty(self.data_key, value)
 
     @property
     def is_on(self) -> bool:
         """Return the state of the sensor."""
-        return getattr(self.coordinator.data, self.data_key)
-    
+        value = getattr(self.coordinator.data, self.data_key, None)
+
+        if self.data_subkey is None:
+            return value
+
+        sub_value = value.get(self.data_subkey, None)
+
+        return sub_value
+
     @property
     def state(self):
         return STATE_ON if self.is_on else STATE_OFF

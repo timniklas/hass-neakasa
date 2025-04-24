@@ -82,6 +82,9 @@
             }
         },
         "switch": {
+            "auto_clean": {
+                "name": "Auto czysz"
+            },
             "young_cat_mode": {
                 "name": "Tryb dla kociąt"
             },

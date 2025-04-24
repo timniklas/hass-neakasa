@@ -82,6 +82,9 @@
             }
         },
         "switch": {
+            "auto_clean": {
+                "name": "Auto clean"
+            },
             "young_cat_mode": {
                 "name": "Kitten mode"
             },
