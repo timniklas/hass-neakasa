@@ -39,7 +39,7 @@
         },
         "sensor": {
             "auto_clean": {
-                "name": "Auto-Rein"
+                "name": "Automatische Reinigung"
             },
             "cat_sensor": {
                 "name": "Katze {name}"
