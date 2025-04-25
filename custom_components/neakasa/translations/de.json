@@ -38,6 +38,9 @@
             }
         },
         "sensor": {
+            "auto_clean": {
+                "name": "Automatische Reinigung"
+            },
             "cat_sensor": {
                 "name": "Katze {name}"
             },

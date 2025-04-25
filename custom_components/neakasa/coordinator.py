@@ -26,6 +26,7 @@ class NeakasaAPIData:
     """Class to hold api data."""
 
     binFullWaitReset: bool
+    cleanCfg: dict[str, Any]
     sandLevelState: int
     sandLevelPercent: int
     bucketStatus: int
@@ -79,7 +80,7 @@ class NeakasaCoordinator(DataUpdateCoordinator):
         self.api = NeakasaAPI(session, hass.async_add_executor_job)
         
 
-    async def setProperty(self, key: str, value: int):
+    async def setProperty(self, key: str, value: Any):
         await self.api.connect(self.username, self.password)
         await self.api.setDeviceProperties(self.deviceid, {key: value})
         #update data
@@ -132,7 +133,7 @@ class NeakasaCoordinator(DataUpdateCoordinator):
         """
         try:
             devicedata = await self._getDeviceProperties()
-
+            
             newLastUseDate = devicedata['catLeft']['time']
 
             if self.lastUseDate != newLastUseDate:
@@ -145,6 +146,7 @@ class NeakasaCoordinator(DataUpdateCoordinator):
             try:
                 return NeakasaAPIData(
                     binFullWaitReset=devicedata['binFullWaitReset']['value'] == 1, #-> Abfalleimer voll
+                    cleanCfg=devicedata['cleanCfg']['value'],
                     youngCatMode=devicedata['youngCatMode']['value'] == 1, #-> Kätzchen Modus
                     childLockOnOff=devicedata['childLockOnOff']['value'] == 1, #-> Kindersicherung
                     autoBury=devicedata['autoBury']['value'] == 1, #-> automatische Abdeckung
