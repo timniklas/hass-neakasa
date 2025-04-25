@@ -1,5 +1,7 @@
 {
   "name": "Neakasa",
   "render_readme": true,
-  "country": "DE"
+  "country": "DE",
+  "zip_release": true,
+  "filename": "neakasa.zip"
 }
